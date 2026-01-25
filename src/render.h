@@ -25,15 +25,15 @@ typedef struct star_s {
 } star_t;
 
 typedef struct sidebar_s {
+    Texture2D               sprite;
     Rectangle               base;
     Rectangle               frame;
-    Rectangle               top_frame;
+    float                   timer;
+    float                   displacement;
 } sidebar_t;
 
 typedef struct render_s {
-    float                   delta;
-    sidebar_t               gui_rec;
-    Texture2D               gui_sprite;
+    sidebar_t               gui;
     Texture2D               characters;
     RenderTexture2D         background;
     RenderTexture2D         target;

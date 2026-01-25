@@ -55,6 +55,7 @@ void InitPlayer(player_t *playermgr) {
     playermgr->sprite_rec   = (Rectangle) { 0.f, 0.f, PLAYER_WIDTH, PLAYER_HEIGHT };
     playermgr->pos          = (Vector2) { GAME_WIDTH/2, GAME_HEIGHT-PLAYER_HEIGHT };
     playermgr->speed        = GAME_WIDTH/(2*2*60); // move half of the screen in two seconds running the game at 60 fps
+    playermgr->health = 3;
 
     TraceLog(LOG_INFO, "PLAYER: Initialised!");
 }
@@ -62,9 +63,15 @@ void InitPlayer(player_t *playermgr) {
 void UpdatePosition(player_t *playermgr) {
     if (IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT)) {
         playermgr->pos.x -= playermgr->speed;
+        if (playermgr->pos.x < 69) {
+            playermgr->pos.x = 69;
+        }
     }
     if (IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT)) {
         playermgr->pos.x += playermgr->speed;
+        if (playermgr->pos.x > GAME_WIDTH-69-PLAYER_WIDTH) {
+            playermgr->pos.x = GAME_WIDTH-69-PLAYER_WIDTH;
+        }
     }
 }
 

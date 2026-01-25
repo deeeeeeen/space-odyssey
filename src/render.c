@@ -104,18 +104,29 @@ void DrawProjectiles(render_t *rendermgr, projectiles_t *projectilemgr) {
     }
 }
 
-void DrawSideBar(render_t *rendermgr) {
-    Vector2 base_pos_left = { 0.f, -(rendermgr->gui_rec.base.height-GAME_HEIGHT) };
-    Vector2 base_pos_right = { GAME_WIDTH-rendermgr->gui_rec.base.width, -(rendermgr->gui_rec.base.height-GAME_HEIGHT) };
-    Vector2 frame_pos_left = { 0.f, 0.f };
-    Vector2 frame_pos_right = { GAME_WIDTH-rendermgr->gui_rec.base.width, 0.f };
 
-    DrawTextureRec(rendermgr->gui_sprite, rendermgr->gui_rec.base, base_pos_left, WHITE);
-    DrawTextureRec(rendermgr->gui_sprite, rendermgr->gui_rec.base, base_pos_right, WHITE);
-    DrawTextureRec(rendermgr->gui_sprite, rendermgr->gui_rec.frame, frame_pos_left, WHITE);
-    DrawTextureRec(rendermgr->gui_sprite, rendermgr->gui_rec.frame, frame_pos_right, WHITE);
-    DrawTextureRec(rendermgr->gui_sprite, rendermgr->gui_rec.top_frame, frame_pos_left, WHITE);
-    DrawTextureRec(rendermgr->gui_sprite, rendermgr->gui_rec.top_frame, frame_pos_right, WHITE);
+
+void DrawSideBar(render_t *rendermgr) {
+    rendermgr->gui.timer += GetFrameTime();
+
+    if (rendermgr->gui.timer >= 3.2/60) {
+        rendermgr->gui.timer = 0;
+        rendermgr->gui.displacement++;
+        if (rendermgr->gui.displacement >= 32) {
+            rendermgr->gui.displacement = 0;
+        }
+    }
+
+    Vector2 base_pos_left = { 0.f, -(rendermgr->gui.base.height-GAME_HEIGHT)+rendermgr->gui.displacement };
+    Vector2 base_pos_right = { GAME_WIDTH-rendermgr->gui.base.width, -(rendermgr->gui.base.height-GAME_HEIGHT)+rendermgr->gui.displacement };
+    Vector2 frame_pos_left = { 0.f, -(rendermgr->gui.base.height-GAME_HEIGHT) };
+    Vector2 frame_pos_right = { GAME_WIDTH-rendermgr->gui.base.width, -(rendermgr->gui.base.height-GAME_HEIGHT) };
+
+    DrawTextureRec(rendermgr->gui.sprite, rendermgr->gui.base, base_pos_left, WHITE);
+    DrawTextureRec(rendermgr->gui.sprite, rendermgr->gui.base, base_pos_right, WHITE);
+
+    DrawTextureRec(rendermgr->gui.sprite, rendermgr->gui.frame, frame_pos_left, WHITE);
+    DrawTextureRec(rendermgr->gui.sprite, rendermgr->gui.frame, frame_pos_right, WHITE);
 }
 
 void ProjectileCollMgr(render_t *rendermgr, projectiles_t *projectilemgr, enemies_t *enemymgr, player_t *playermgr) {
@@ -148,6 +159,7 @@ void ProjectileCollMgr(render_t *rendermgr, projectiles_t *projectilemgr, enemie
 
                 if (CheckCollisionPointCircle(proj_pos, player_coll_center, radius)) {
                     projectilemgr->projectiles[proj_idx].alive = false;
+                    projectilemgr->projectiles[proj_idx].pos = (Vector2) { 0.f, 0.f };
                     playermgr->health--;
                 }
             }
@@ -164,11 +176,10 @@ void InitRender(render_t *rendermgr) {
     rendermgr->monitor_size = (Vector2) { GetMonitorWidth(GetCurrentMonitor()), GetMonitorHeight(GetCurrentMonitor()) };
     rendermgr->characters = LoadTexture("res/characters.png");
 
-    // sidebar
-    rendermgr->gui_sprite = LoadTexture("res/gui.png");
-    rendermgr->gui_rec.base = (Rectangle) { 69.f, 0.f, 69.f, 320.f };
-    rendermgr->gui_rec.frame = (Rectangle) { 0.f, 32.f, 69.f, 288.f };
-    rendermgr->gui_rec.top_frame = (Rectangle) { 0.f, 0.f, 69.f, 6.f };
+    // sidebars
+    rendermgr->gui.sprite = LoadTexture("res/gui.png");
+    rendermgr->gui.base = (Rectangle) { 69.f, 0.f, 69.f, 320.f };
+    rendermgr->gui.frame = (Rectangle) { 0.f, 0.f, 69.f, 320.f };
     // ---
 
     InitStars(rendermgr);
@@ -178,7 +189,6 @@ void InitRender(render_t *rendermgr) {
 }
 
 void RenderWindow(render_t *rendermgr, frame_t *framemgr, player_t *playermgr, enemies_t *enemymgr, projectiles_t *projectilemgr) {
-    rendermgr->delta = GetFrameTime();
     BeginTextureMode(rendermgr->target);
         ClearBackground(BLACK);
         BeginMode2D(framemgr->camera);

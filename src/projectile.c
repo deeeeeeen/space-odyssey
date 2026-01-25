@@ -24,6 +24,4 @@ void UpdateProjectiles(projectiles_t *projectilemgr) {
             }
         }
     }
-
-    TraceLog(LOG_INFO, TextFormat("Numbers of projectiles still alive: %d", projectilemgr->projectile_count));
 }

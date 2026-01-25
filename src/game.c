@@ -33,7 +33,7 @@ void RunGame(game_t *gamemgr) {
     while (!WindowShouldClose())
     {
         UpdatePlayer(&gamemgr->playermgr, &gamemgr->projectilemgr);   
-        UpdateEnemy(&gamemgr->enemymgr);
+        UpdateEnemy(&gamemgr->enemymgr, &gamemgr->projectilemgr);
         UpdateProjectiles(&gamemgr->projectilemgr);
         ProjectileCollMgr(&gamemgr->rendermgr, &gamemgr->projectilemgr, &gamemgr->enemymgr, &gamemgr->playermgr);
         RenderWindow(&gamemgr->rendermgr, &gamemgr->framemgr, &gamemgr->playermgr, &gamemgr->enemymgr, &gamemgr->projectilemgr);
