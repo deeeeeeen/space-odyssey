@@ -1,6 +1,6 @@
 #include "player.h"
 
-void GeneratePlayerProjectiles(player_t *playermgr, projectiles_t *projectilemgr) {
+void GeneratePlayerProjectiles(player_t *playermgr, projectilegroup_t *projectilemgr) {
     if (IsKeyPressed(KEY_LEFT_CONTROL)) {
         int new_proj_idx = ReturnEmptyProjectileIdx(projectilemgr);
 
@@ -75,11 +75,11 @@ void UpdatePosition(player_t *playermgr) {
     }
 }
 
-void UpdatePlayerInput(player_t *playermgr, projectiles_t *projectilemgr) {
+void UpdatePlayerInput(player_t *playermgr, projectilegroup_t *projectilemgr) {
     UpdatePosition(playermgr);
     GeneratePlayerProjectiles(playermgr, projectilemgr);
 }
 
-void UpdatePlayer(player_t *playermgr, projectiles_t *projectilemgr) {
+void UpdatePlayer(player_t *playermgr, projectilegroup_t *projectilemgr) {
     UpdatePlayerInput(playermgr, projectilemgr);
 }

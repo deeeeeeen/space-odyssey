@@ -21,13 +21,12 @@ enum enemy_e {
     BOSS
 };
 
-typedef struct projectiles_s projectiles_t;
+typedef struct projectilegroup_s projectilegroup_t;
 
 typedef struct level1_s {
     int         dirs[6];
     int         dir_idx;
     float       proj_delta;
-    float       alive_percentage;
 } level1_t;
 
 typedef struct enemy_s {
@@ -40,14 +39,15 @@ typedef struct enemy_s {
     bool        alive;
 } enemy_t;
 
-typedef struct enemies_s {
+typedef struct enemygroup_s {
     enemy_t     enemies[MAX_ENEMIES];
     int         enemy_count;
+    float       alive_count;
     float       timer;
     level1_t    level1;    
-} enemies_t;
+} enemygroup_t;
 
-void InitEnemy(enemies_t *enemymgr);
-void UpdateEnemy(enemies_t *enemymgr, projectiles_t *projectilemgr);
+void InitEnemy(enemygroup_t *enemymgr);
+void UpdateEnemy(enemygroup_t *enemymgr, projectilegroup_t *projectilemgr);
 
 #endif

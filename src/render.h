@@ -16,8 +16,8 @@
 typedef struct game_s           game_t;
 typedef struct frame_s          frame_t;
 typedef struct player_s         player_t;
-typedef struct enemies_s        enemies_t;
-typedef struct projectiles_s    projectiles_t;
+typedef struct enemygroup_s        enemygroup_t;
+typedef struct projectilegroup_s    projectilegroup_t;
 
 typedef struct star_s {
     Vector2     atls[GRID_3X3];
@@ -41,10 +41,10 @@ typedef struct render_s {
     Vector2                 monitor_size;
     star_t                  stars[MAX_STARS];
     int                     starcount;
+    float                   stars_timer;
 } render_t;
 
 void InitRender(render_t *rendermgr);
-void RenderWindow(render_t *rendermgr, frame_t *framemgr, player_t *playermgr, enemies_t *enemymgr, projectiles_t *projectilemgr);
-void ProjectileCollMgr(render_t *rendermgr, projectiles_t *projectilemgr, enemies_t *enemymgr, player_t *playermgr);
+void RenderWindow(render_t *rendermgr, frame_t *framemgr, player_t *playermgr, enemygroup_t *enemymgr, projectilegroup_t *projectilemgr);
 
 #endif

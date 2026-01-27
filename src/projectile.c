@@ -2,7 +2,7 @@
 #include <stdio.h>
 
 // returns the index of a 'dead' projectile, if none exist increment the 'projectile_count' by 1
-int ReturnEmptyProjectileIdx(projectiles_t *projectilemgr) {
+int ReturnEmptyProjectileIdx(projectilegroup_t *projectilemgr) {
     for (int proj_idx = 0; proj_idx < projectilemgr->projectile_count; proj_idx++) {
         if (!projectilemgr->projectiles[proj_idx].alive) {
             return proj_idx;
@@ -11,7 +11,7 @@ int ReturnEmptyProjectileIdx(projectiles_t *projectilemgr) {
     return projectilemgr->projectile_count;
 }
 
-void UpdateProjectiles(projectiles_t *projectilemgr) {
+void UpdateProjectiles(projectilegroup_t *projectilemgr) {
     int count = 0;
     for (int proj_idx = 0; proj_idx < projectilemgr->projectile_count; proj_idx++) {
         if (projectilemgr->projectiles[proj_idx].alive) { // maybe not necessary to check, but just because :)

@@ -9,7 +9,7 @@
 #define GAME_WIDTH          512
 #define GAME_HEIGHT         288
 
-typedef struct projectiles_s projectiles_t;
+typedef struct projectilegroup_s projectilegroup_t;
 
 typedef struct player_s {
     Rectangle   sprite_rec;
@@ -20,6 +20,6 @@ typedef struct player_s {
 } player_t;
 
 void InitPlayer(player_t *playermgr);
-void UpdatePlayer(player_t *playermgr, projectiles_t *projectilemgr);
+void UpdatePlayer(player_t *playermgr, projectilegroup_t *projectilemgr);
 
 #endif

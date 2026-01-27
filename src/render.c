@@ -77,7 +77,7 @@ void DrawPlayer(render_t *rendermgr, player_t *playermgr) {
     DrawTextureRec(rendermgr->characters, playermgr->sprite_rec, playermgr->pos, WHITE);
 }
 
-void DrawEnemies(render_t *rendermgr, enemies_t *enemymgr) {
+void DrawEnemies(render_t *rendermgr, enemygroup_t *enemymgr) {
     for (int enemy_idx = 0; enemy_idx < enemymgr->enemy_count; enemy_idx++) {
         if (enemymgr->enemies[enemy_idx].alive) {
             DrawTextureRec(rendermgr->characters, enemymgr->enemies[enemy_idx].sprite_rec, enemymgr->enemies[enemy_idx].pos, WHITE);
@@ -85,26 +85,28 @@ void DrawEnemies(render_t *rendermgr, enemies_t *enemymgr) {
     }
 }
 
-void DrawProjectiles(render_t *rendermgr, projectiles_t *projectilemgr) {
+Color ProjColorType(projectile_t *projectile) {
+    return (projectile->friendly == true) ? GREEN : RED;
+}
+
+void DrawProjectiles(render_t *rendermgr, projectilegroup_t *projectilemgr) {
     for (int proj_idx = 0; proj_idx < projectilemgr->projectile_count; proj_idx++) {
         projectile_t proj = projectilemgr->projectiles[proj_idx];
         if (projectilemgr->projectiles[proj_idx].alive) {
             switch (projectilemgr->projectiles[proj_idx].type) {
                 case SINGLE:
-                    DrawLine(proj.pos.x, proj.pos.y-1, proj.pos.x+1, proj.pos.y+1, WHITE);
+                    DrawLine(proj.pos.x, proj.pos.y-1, proj.pos.x+1, proj.pos.y+1, ProjColorType(&proj));
                     break;
                 case DOUBLE:
-                    DrawLine(proj.pos.x, proj.pos.y-1, proj.pos.x+1, proj.pos.y+1, WHITE);
+                    DrawLine(proj.pos.x, proj.pos.y-1, proj.pos.x+1, proj.pos.y+1, ProjColorType(&proj));
                     break;
                 case TRIPLE:
-                    DrawLine(proj.pos.x, proj.pos.y-1, proj.pos.x+1, proj.pos.y+1, WHITE);
+                    DrawLine(proj.pos.x, proj.pos.y-1, proj.pos.x+1, proj.pos.y+1, ProjColorType(&proj));
                     break;
             }
         }
     }
 }
-
-
 
 void DrawSideBar(render_t *rendermgr) {
     rendermgr->gui.timer += GetFrameTime();
@@ -129,44 +131,6 @@ void DrawSideBar(render_t *rendermgr) {
     DrawTextureRec(rendermgr->gui.sprite, rendermgr->gui.frame, frame_pos_right, WHITE);
 }
 
-void ProjectileCollMgr(render_t *rendermgr, projectiles_t *projectilemgr, enemies_t *enemymgr, player_t *playermgr) {
-    int proj_size = projectilemgr->projectile_count;
-    int enemy_size = enemymgr->enemy_count;
-
-    for (int proj_idx = 0; proj_idx < proj_size; proj_idx++) {
-        for (int enemy_idx = 0; enemy_idx < enemy_size; enemy_idx++) {
-            bool alive_enemy = enemymgr->enemies[enemy_idx].alive;
-            bool friendly_proj = projectilemgr->projectiles[proj_idx].friendly;
-
-            if (friendly_proj && alive_enemy) {
-                Vector2 proj_pos = projectilemgr->projectiles[proj_idx].pos;
-                Vector2 enemy_coll_center = {enemymgr->enemies[enemy_idx].pos.x + 9, enemymgr->enemies[enemy_idx].pos.y + 9};
-                float radius = 7.f;
-
-                if (CheckCollisionPointCircle(proj_pos, enemy_coll_center, radius)) {
-                    projectilemgr->projectiles[proj_idx].alive = false;
-                    projectilemgr->projectiles[proj_idx].pos = (Vector2) { 0.f, 0.f }; // i NEED to move the projectile otherwise the game will implode
-                    enemymgr->enemies[enemy_idx].health--;
-                    if (enemymgr->enemies[enemy_idx].health <= 0) {
-                        enemymgr->enemies[enemy_idx].alive = false;
-                    }
-                }
-            }
-            if (!friendly_proj) {
-                Vector2 proj_pos = projectilemgr->projectiles[proj_idx].pos;
-                Vector2 player_coll_center = {playermgr->pos.x + 9, playermgr->pos.y + 9};
-                float radius = 8.f;
-
-                if (CheckCollisionPointCircle(proj_pos, player_coll_center, radius)) {
-                    projectilemgr->projectiles[proj_idx].alive = false;
-                    projectilemgr->projectiles[proj_idx].pos = (Vector2) { 0.f, 0.f };
-                    playermgr->health--;
-                }
-            }
-        }
-    }
-}
-
 void InitRender(render_t *rendermgr) {
     rendermgr->game_size = (Vector2) { GAME_WIDTH, GAME_HEIGHT };
     rendermgr->target = LoadRenderTexture(rendermgr->game_size.x, rendermgr->game_size.y);
@@ -188,7 +152,7 @@ void InitRender(render_t *rendermgr) {
     TraceLog(LOG_INFO, "RENDER: Initialised!");
 }
 
-void RenderWindow(render_t *rendermgr, frame_t *framemgr, player_t *playermgr, enemies_t *enemymgr, projectiles_t *projectilemgr) {
+void RenderWindow(render_t *rendermgr, frame_t *framemgr, player_t *playermgr, enemygroup_t *enemymgr, projectilegroup_t *projectilemgr) {
     BeginTextureMode(rendermgr->target);
         ClearBackground(BLACK);
         BeginMode2D(framemgr->camera);

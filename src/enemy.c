@@ -1,6 +1,6 @@
 #include "enemy.h"
 
-void PrepareLevel1Enemies(enemies_t *enemymgr) {
+void PrepareLevel1Enemies(enemygroup_t *enemymgr) {
     enemymgr->level1.dirs[0] = RIGHT;
     enemymgr->level1.dirs[1] = DOWN;
     enemymgr->level1.dirs[2] = LEFT;
@@ -17,10 +17,11 @@ void PrepareLevel1Enemies(enemies_t *enemymgr) {
         enemymgr->enemies[enemy_idx].category = NORMAL;
         enemymgr->enemies[enemy_idx].alive = true;
         enemymgr->enemy_count++;
+        enemymgr->alive_count++;
     }
 }
 
-void InitEnemy(enemies_t *enemymgr) {
+void InitEnemy(enemygroup_t *enemymgr) {
     
     enemymgr->enemy_count = 0;
     PrepareLevel1Enemies(enemymgr);
@@ -28,7 +29,7 @@ void InitEnemy(enemies_t *enemymgr) {
     TraceLog(LOG_INFO, "ENEMIES: Initialised!");
 }
 
-int ReturnRandomAliveEnemyIdx(enemies_t *enemymgr) {
+int ReturnRandomAliveEnemyIdx(enemygroup_t *enemymgr) {
     int random_idx = 0;
     while (1) {
         random_idx = GetRandomValue(0, MAX_ENEMIES-1);
@@ -40,7 +41,7 @@ int ReturnRandomAliveEnemyIdx(enemies_t *enemymgr) {
     return random_idx;
 }
 
-void GenerateEnemyProjectiles(enemies_t *enemymgr, projectiles_t *projectilemgr) {
+void GenerateEnemyProjectiles(enemygroup_t *enemymgr, projectilegroup_t *projectilemgr) {
     int new_proj_idx = ReturnEmptyProjectileIdx(projectilemgr);
     int alive_enemy_idx = ReturnRandomAliveEnemyIdx(enemymgr);
 
@@ -65,17 +66,11 @@ void GenerateEnemyProjectiles(enemies_t *enemymgr, projectiles_t *projectilemgr)
     }
 }
 
-float ReturnAliveEnemies(enemies_t *enemymgr) {
-    int count = 0;
-    for (int i = 0; i < enemymgr->enemy_count; i++) {
-        if (enemymgr->enemies[i].alive) {
-            count++;
-        }
-    }
-    return count;
+float ReturnAliveEnemies(enemygroup_t *enemymgr) {
+    return enemymgr->alive_count;
 }
 
-void Level1Behaviour(enemies_t *enemymgr, projectiles_t *projectilemgr) {
+void Level1Behaviour(enemygroup_t *enemymgr, projectilegroup_t *projectilemgr) {
    /*
     * this ai follows the usual space invader movement + some projectiles
     *
@@ -100,7 +95,7 @@ void Level1Behaviour(enemies_t *enemymgr, projectiles_t *projectilemgr) {
         enemymgr->timer += GetFrameTime();
         enemymgr->level1.proj_delta += GetFrameTime();
 
-        if (enemymgr->level1.proj_delta >= .25*(1/(ReturnAliveEnemies(enemymgr)/100))) { // very dirty way of decreasing the rate of fire the lesser enemies are alive
+        if (enemymgr->level1.proj_delta >= .25*(1/(enemymgr->alive_count/100))) { // very dirty way of decreasing the rate of fire the lesser enemies are alive
             enemymgr->level1.proj_delta = 0;
             GenerateEnemyProjectiles(enemymgr, projectilemgr);
         }
@@ -141,7 +136,7 @@ void Level1Behaviour(enemies_t *enemymgr, projectiles_t *projectilemgr) {
     }
 }
 
-void UpdatePositions(enemies_t *enemymgr, projectiles_t *projectilemgr) {
+void UpdatePositions(enemygroup_t *enemymgr, projectilegroup_t *projectilemgr) {
     int level = 1;
     for (int i = 0; i < enemymgr->enemy_count; i++) {
         if (enemymgr->enemies[i].alive) {
@@ -157,7 +152,6 @@ void UpdatePositions(enemies_t *enemymgr, projectiles_t *projectilemgr) {
         break;
     }
 }
-
-void UpdateEnemy(enemies_t *enemymgr, projectiles_t *projectilemgr) {
+void UpdateEnemy(enemygroup_t *enemymgr, projectilegroup_t *projectilemgr) {
     UpdatePositions(enemymgr, projectilemgr);
 }

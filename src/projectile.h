@@ -23,12 +23,12 @@ typedef struct projectile_s {
     Vector2         pos;
 } projectile_t;
 
-typedef struct projectiles_s {
+typedef struct projectilegroup_s {
     projectile_t    projectiles[MAX_PROJECTILES];
     int             projectile_count;
-} projectiles_t;
+} projectilegroup_t;
 
-int ReturnEmptyProjectileIdx(projectiles_t *projectilemgr);
-void UpdateProjectiles(projectiles_t *projectilemgr);
+int ReturnEmptyProjectileIdx(projectilegroup_t *projectilemgr);
+void UpdateProjectiles(projectilegroup_t *projectilemgr);
 
 #endif
