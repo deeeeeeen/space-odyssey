@@ -1,5 +1,7 @@
 #include "render.h"
 
+const Color SPACE_COLOR = { 5, 0, 19, 255 };
+
 void GenerateStars(render_t *rendermgr) {
     int starType = GetRandomValue(0,3);
     int starX    = GetRandomValue(0, rendermgr->game_size.x);
@@ -64,7 +66,7 @@ void DrawStars(render_t *rendermgr) {
     rendermgr->background = LoadRenderTexture(GAME_WIDTH, GAME_HEIGHT);
 
     BeginTextureMode(rendermgr->background);
-        ClearBackground(BLACK);
+        ClearBackground(SPACE_COLOR);
         for (int i = 0; i < MAX_STARS; i++) {
             for (int j = 0; j < GRID_3X3; j++) {
                 DrawPixelV(rendermgr->stars[i].atls[j], rendermgr->stars[i].clr[j]);
@@ -140,6 +142,15 @@ void InitRender(render_t *rendermgr) {
     rendermgr->monitor_size = (Vector2) { GetMonitorWidth(GetCurrentMonitor()), GetMonitorHeight(GetCurrentMonitor()) };
     rendermgr->characters = LoadTexture("res/characters.png");
 
+    rendermgr->cutscene.top_bar = (Rectangle) { 69.f, 
+                                                -48.f, 
+                                                rendermgr->game_size.x-69*2,
+                                                48.f };
+    rendermgr->cutscene.bottom_bar = (Rectangle) { 69.f, 
+                                                rendermgr->game_size.y, 
+                                                rendermgr->game_size.x-69*2, 
+                                                48.f };
+
     // sidebars
     rendermgr->gui.sprite = LoadTexture("res/gui.png");
     rendermgr->gui.base = (Rectangle) { 69.f, 0.f, 69.f, 320.f };
@@ -152,6 +163,43 @@ void InitRender(render_t *rendermgr) {
     TraceLog(LOG_INFO, "RENDER: Initialised!");
 }
 
+void DrawCutscene(render_t *rendermgr, player_t *playermgr, enemygroup_t *enemymgr) {
+    if (!enemymgr->clear) return;
+    playermgr->in_cutscene.active = true;
+    rendermgr->cutscene.timer += GetFrameTime();
+
+    if (!playermgr->in_cutscene.done) {
+        if (rendermgr->cutscene.timer >= 5) {
+            float timer = rendermgr->cutscene.timer-5;
+            if (timer > 2.5/60) {
+                rendermgr->cutscene.timer = 5;
+                if (rendermgr->cutscene.displacement < 48) {
+                    rendermgr->cutscene.displacement++;
+                    rendermgr->cutscene.top_bar.y++;
+                    rendermgr->cutscene.bottom_bar.y--;
+                }
+            }
+        }
+    }
+    if (playermgr->in_cutscene.done) {
+        float timer = rendermgr->cutscene.timer-5;
+        if (timer > 2.5/60) {
+            rendermgr->cutscene.timer = 5;
+            if (rendermgr->cutscene.displacement > 0) {
+                rendermgr->cutscene.displacement--;
+                rendermgr->cutscene.top_bar.y--;
+                rendermgr->cutscene.bottom_bar.y++;
+            }
+            else {
+                enemymgr->clear = false;
+                playermgr->in_cutscene.active = false;
+            }
+        }
+    }
+    DrawRectangleRec(rendermgr->cutscene.top_bar, BLACK);
+    DrawRectangleRec(rendermgr->cutscene.bottom_bar, BLACK);
+}
+
 void RenderWindow(render_t *rendermgr, frame_t *framemgr, player_t *playermgr, enemygroup_t *enemymgr, projectilegroup_t *projectilemgr) {
     BeginTextureMode(rendermgr->target);
         ClearBackground(BLACK);
@@ -161,6 +209,7 @@ void RenderWindow(render_t *rendermgr, frame_t *framemgr, player_t *playermgr, e
             DrawEnemies(rendermgr, enemymgr);
             DrawProjectiles(rendermgr, projectilemgr);
             DrawSideBar(rendermgr);
+            DrawCutscene(rendermgr, playermgr, enemymgr);
         EndMode2D();
     EndTextureMode();
 

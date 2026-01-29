@@ -53,11 +53,51 @@ void GeneratePlayerProjectiles(player_t *playermgr, projectilegroup_t *projectil
 
 void InitPlayer(player_t *playermgr) {
     playermgr->sprite_rec   = (Rectangle) { 0.f, 0.f, PLAYER_WIDTH, PLAYER_HEIGHT };
-    playermgr->pos          = (Vector2) { GAME_WIDTH/2, GAME_HEIGHT-PLAYER_HEIGHT };
+    playermgr->pos          = (Vector2) { GAME_WIDTH/2, GAME_HEIGHT-PLAYER_HEIGHT-1 };
     playermgr->speed        = GAME_WIDTH/(2*2*60); // move half of the screen in two seconds running the game at 60 fps
     playermgr->health = 3;
 
     TraceLog(LOG_INFO, "PLAYER: Initialised!");
+}
+
+void InitCutscene(player_t *playermgr) {
+    if (!playermgr->in_cutscene.active) return;
+    playermgr->in_cutscene.timer += GetFrameTime();
+    if (playermgr->in_cutscene.timer < 5+(2.5/60)) return;
+    if (IsKeyPressed(KEY_Q) && playermgr->pos.y == GAME_HEIGHT-PLAYER_HEIGHT-3*16-1) {
+        playermgr->in_cutscene.done = true;
+        playermgr->in_cutscene.timer = 5+(2.5/60);
+    }
+
+    if (!playermgr->in_cutscene.done) {
+
+        float timer = playermgr->in_cutscene.timer-(5+(2.5/60));
+        
+        if (timer > 2.5/60) {
+            playermgr->in_cutscene.timer = 5+(2.5/60);
+            if (playermgr->pos.y != GAME_HEIGHT-PLAYER_HEIGHT-3*16-1) {
+                playermgr->pos.y--;
+                if (playermgr->pos.y <= GAME_HEIGHT-PLAYER_HEIGHT-3*16-1) {
+                    playermgr->pos.y = GAME_HEIGHT-PLAYER_HEIGHT-3*16-1;
+                }
+            }
+        }
+    }
+    else if (playermgr->in_cutscene.done) {
+
+        float timer = playermgr->in_cutscene.timer-(5+(2.5/60));
+
+        if (timer > 2.5/60) {
+            playermgr->in_cutscene.timer = 5+(2.5/60);
+            if (playermgr->pos.y != GAME_HEIGHT-PLAYER_HEIGHT-1) {
+                playermgr->pos.y++;
+                if (playermgr->pos.y >= GAME_HEIGHT-PLAYER_HEIGHT-1) {
+                    playermgr->pos.y = GAME_HEIGHT-PLAYER_HEIGHT-1;
+                    playermgr->in_cutscene.active = true;
+                }
+            }
+        }
+    }
 }
 
 void UpdatePosition(player_t *playermgr) {
@@ -76,7 +116,9 @@ void UpdatePosition(player_t *playermgr) {
 }
 
 void UpdatePlayerInput(player_t *playermgr, projectilegroup_t *projectilemgr) {
+    InitCutscene(playermgr);
     UpdatePosition(playermgr);
+    if (playermgr->in_cutscene.active) return;
     GeneratePlayerProjectiles(playermgr, projectilemgr);
 }
 

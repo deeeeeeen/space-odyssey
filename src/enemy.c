@@ -83,15 +83,15 @@ void Level1Behaviour(enemygroup_t *enemymgr, projectilegroup_t *projectilemgr) {
     * 
     */
 
-    bool done = true;
+    enemymgr->clear = true;
     for (int i = 0; i < enemymgr->enemy_count; i++) {
         if (enemymgr->enemies[i].alive) {
-            done = false;
+            enemymgr->clear = false;
             break;
         }
     }
 
-    if (!done) {
+    if (!enemymgr->clear) {
         enemymgr->timer += GetFrameTime();
         enemymgr->level1.proj_delta += GetFrameTime();
 
@@ -152,6 +152,7 @@ void UpdatePositions(enemygroup_t *enemymgr, projectilegroup_t *projectilemgr) {
         break;
     }
 }
+
 void UpdateEnemy(enemygroup_t *enemymgr, projectilegroup_t *projectilemgr) {
     UpdatePositions(enemymgr, projectilemgr);
 }

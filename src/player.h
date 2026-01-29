@@ -11,12 +11,19 @@
 
 typedef struct projectilegroup_s projectilegroup_t;
 
+typedef struct cutscene {
+    bool        active;
+    float       timer;
+    bool        done;
+} cutscene;
+
 typedef struct player_s {
     Rectangle   sprite_rec;
     Vector2     pos;
     float       speed;
     int         health;
     int         projectile_type;
+    cutscene    in_cutscene;
 } player_t;
 
 void InitPlayer(player_t *playermgr);

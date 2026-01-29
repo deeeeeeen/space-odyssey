@@ -44,6 +44,7 @@ typedef struct enemygroup_s {
     int         enemy_count;
     float       alive_count;
     float       timer;
+    bool        clear;
     level1_t    level1;    
 } enemygroup_t;
 
