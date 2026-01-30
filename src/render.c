@@ -1,80 +1,5 @@
 #include "render.h"
 
-const Color SPACE_COLOR = { 5, 0, 19, 255 };
-
-void GenerateStars(render_t *rendermgr) {
-    int starType = GetRandomValue(0,3);
-    int starX    = GetRandomValue(0, rendermgr->game_size.x);
-    int starY    = GetRandomValue(0, rendermgr->game_size.y);
-    
-    star_t star = {
-        .atls[0] = (Vector2) {starX, starY},
-        .atls[1] = (Vector2) {starX+1, starY},
-        .atls[2] = (Vector2) {starX+2, starY},
-        .atls[3] = (Vector2) {starX, starY+1},
-        .atls[4] = (Vector2) {starX+1, starY+1},
-        .atls[5] = (Vector2) {starX+2, starY+1},
-        .atls[6] = (Vector2) {starX, starY+2},
-        .atls[7] = (Vector2) {starX+1, starY+2},
-        .atls[8] = (Vector2) {starX+2, starY+2}
-    };
-    
-    switch (starType) {
-        case 0: {
-            star.clr[4] = WHITE;
-            break;
-        }
-        case 1: {
-            star.clr[1] = WHITE;
-            star.clr[3] = WHITE;
-            star.clr[4] = WHITE;
-            star.clr[5] = WHITE;
-            star.clr[7] = WHITE;
-            break;
-        }
-        case 2: {
-            star.clr[0] = WHITE;
-            star.clr[2] = WHITE;
-            star.clr[4] = WHITE;
-            star.clr[6] = WHITE;
-            star.clr[8] = WHITE;
-            break;
-        }
-        default: {
-            break;
-        }
-    }
-
-    for (int i = 0; i < MAX_STARS; i++) {
-        for (int j = 0; j < 9; j++) {
-            star.clr[j].a = GetRandomValue(0, 255);
-        }
-    }
-    
-    rendermgr->stars[rendermgr->starcount] = star;
-    rendermgr->starcount++;
-}
-
-void InitStars(render_t *rendermgr) {
-    rendermgr->starcount = 0;
-    for (int i = 0; i < MAX_STARS; i++) {
-        GenerateStars(rendermgr);
-    }
-}
-
-void DrawStars(render_t *rendermgr) {
-    rendermgr->background = LoadRenderTexture(GAME_WIDTH, GAME_HEIGHT);
-
-    BeginTextureMode(rendermgr->background);
-        ClearBackground(SPACE_COLOR);
-        for (int i = 0; i < MAX_STARS; i++) {
-            for (int j = 0; j < GRID_3X3; j++) {
-                DrawPixelV(rendermgr->stars[i].atls[j], rendermgr->stars[i].clr[j]);
-            }
-        }
-    EndDrawing();
-}
-
 void DrawPlayer(render_t *rendermgr, player_t *playermgr) {
     DrawTextureRec(rendermgr->characters, playermgr->sprite_rec, playermgr->pos, WHITE);
 }
@@ -87,11 +12,7 @@ void DrawEnemies(render_t *rendermgr, enemygroup_t *enemymgr) {
     }
 }
 
-Color ProjColorType(projectile_t *projectile) {
-    return (projectile->friendly == true) ? GREEN : RED;
-}
-
-void DrawProjectiles(render_t *rendermgr, projectilegroup_t *projectilemgr) {
+void DrawProjectiles(projectilegroup_t *projectilemgr) {
     for (int proj_idx = 0; proj_idx < projectilemgr->projectile_count; proj_idx++) {
         projectile_t proj = projectilemgr->projectiles[proj_idx];
         if (projectilemgr->projectiles[proj_idx].alive) {
@@ -110,27 +31,13 @@ void DrawProjectiles(render_t *rendermgr, projectilegroup_t *projectilemgr) {
     }
 }
 
-void DrawSideBar(render_t *rendermgr) {
-    rendermgr->gui.timer += GetFrameTime();
+void DrawSideBar(gui_t *guimgr) {
+    UpdateSidebar(guimgr);
 
-    if (rendermgr->gui.timer >= 3.2/60) {
-        rendermgr->gui.timer = 0;
-        rendermgr->gui.displacement++;
-        if (rendermgr->gui.displacement >= 32) {
-            rendermgr->gui.displacement = 0;
-        }
-    }
-
-    Vector2 base_pos_left = { 0.f, -(rendermgr->gui.base.height-GAME_HEIGHT)+rendermgr->gui.displacement };
-    Vector2 base_pos_right = { GAME_WIDTH-rendermgr->gui.base.width, -(rendermgr->gui.base.height-GAME_HEIGHT)+rendermgr->gui.displacement };
-    Vector2 frame_pos_left = { 0.f, -(rendermgr->gui.base.height-GAME_HEIGHT) };
-    Vector2 frame_pos_right = { GAME_WIDTH-rendermgr->gui.base.width, -(rendermgr->gui.base.height-GAME_HEIGHT) };
-
-    DrawTextureRec(rendermgr->gui.sprite, rendermgr->gui.base, base_pos_left, WHITE);
-    DrawTextureRec(rendermgr->gui.sprite, rendermgr->gui.base, base_pos_right, WHITE);
-
-    DrawTextureRec(rendermgr->gui.sprite, rendermgr->gui.frame, frame_pos_left, WHITE);
-    DrawTextureRec(rendermgr->gui.sprite, rendermgr->gui.frame, frame_pos_right, WHITE);
+    DrawTextureRec(guimgr->sidebars.sprite, guimgr->sidebars.base, guimgr->sidebars.base_pos_left, WHITE);
+    DrawTextureRec(guimgr->sidebars.sprite, guimgr->sidebars.base, guimgr->sidebars.base_pos_right, WHITE);
+    DrawTextureRec(guimgr->sidebars.sprite, guimgr->sidebars.frame, guimgr->sidebars.frame_pos_left, WHITE);
+    DrawTextureRec(guimgr->sidebars.sprite, guimgr->sidebars.frame, guimgr->sidebars.frame_pos_right, WHITE);
 }
 
 void InitRender(render_t *rendermgr) {
@@ -151,14 +58,10 @@ void InitRender(render_t *rendermgr) {
                                                 rendermgr->game_size.x-69*2, 
                                                 48.f };
 
-    // sidebars
-    rendermgr->gui.sprite = LoadTexture("res/gui.png");
-    rendermgr->gui.base = (Rectangle) { 69.f, 0.f, 69.f, 320.f };
-    rendermgr->gui.frame = (Rectangle) { 0.f, 0.f, 69.f, 320.f };
-    // ---
-
-    InitStars(rendermgr);
-    DrawStars(rendermgr);
+                                                
+    InitStars(&rendermgr->stars);
+    DrawStars(&rendermgr->stars);
+    InitSidebar(&rendermgr->gui);
 
     TraceLog(LOG_INFO, "RENDER: Initialised!");
 }
@@ -170,30 +73,25 @@ void DrawCutscene(render_t *rendermgr, player_t *playermgr, enemygroup_t *enemym
 
     if (!playermgr->in_cutscene.done) {
         if (rendermgr->cutscene.timer >= 5) {
-            float timer = rendermgr->cutscene.timer-5;
-            if (timer > 2.5/60) {
-                rendermgr->cutscene.timer = 5;
-                if (rendermgr->cutscene.displacement < 48) {
-                    rendermgr->cutscene.displacement++;
-                    rendermgr->cutscene.top_bar.y++;
-                    rendermgr->cutscene.bottom_bar.y--;
-                }
+            rendermgr->cutscene.framedelta = GetFrameTime();
+            rendermgr->cutscene.timer = 5;
+            if (rendermgr->cutscene.displacement < 48) {
+                rendermgr->cutscene.displacement += 30*rendermgr->cutscene.framedelta;
+                rendermgr->cutscene.top_bar.y += 30*rendermgr->cutscene.framedelta;
+                rendermgr->cutscene.bottom_bar.y -= 30*rendermgr->cutscene.framedelta;
             }
         }
     }
     if (playermgr->in_cutscene.done) {
-        float timer = rendermgr->cutscene.timer-5;
-        if (timer > 2.5/60) {
-            rendermgr->cutscene.timer = 5;
-            if (rendermgr->cutscene.displacement > 0) {
-                rendermgr->cutscene.displacement--;
-                rendermgr->cutscene.top_bar.y--;
-                rendermgr->cutscene.bottom_bar.y++;
-            }
-            else {
-                enemymgr->clear = false;
-                playermgr->in_cutscene.active = false;
-            }
+        rendermgr->cutscene.timer = 5;
+        if (rendermgr->cutscene.displacement > 0) {
+            rendermgr->cutscene.displacement -= 30*rendermgr->cutscene.framedelta;
+            rendermgr->cutscene.top_bar.y -= 30*rendermgr->cutscene.framedelta;
+            rendermgr->cutscene.bottom_bar.y  += 30*rendermgr->cutscene.framedelta;
+        }
+        else {
+            enemymgr->clear = false;
+            playermgr->in_cutscene.active = false;
         }
     }
     DrawRectangleRec(rendermgr->cutscene.top_bar, BLACK);
@@ -204,21 +102,21 @@ void RenderWindow(render_t *rendermgr, frame_t *framemgr, player_t *playermgr, e
     BeginTextureMode(rendermgr->target);
         ClearBackground(BLACK);
         BeginMode2D(framemgr->camera);
-            DrawTexture(rendermgr->background.texture, 0, 0, WHITE);
+            DrawTexture(rendermgr->stars.backdrop.texture, 0, 0, WHITE);
             DrawPlayer(rendermgr, playermgr);
             DrawEnemies(rendermgr, enemymgr);
-            DrawProjectiles(rendermgr, projectilemgr);
-            DrawSideBar(rendermgr);
+            DrawProjectiles(projectilemgr);
+            DrawSideBar(&rendermgr->gui);
             DrawCutscene(rendermgr, playermgr, enemymgr);
         EndMode2D();
     EndTextureMode();
 
     BeginDrawing();
         DrawTexturePro(rendermgr->target.texture, 
-            (Rectangle){ 0, 0, (float)rendermgr->game_size.x, -(float)rendermgr->game_size.y }, 
-            (Rectangle){ 0, 0, (float)rendermgr->monitor_size.x, (float)rendermgr->monitor_size.y },
-            (Vector2) {0.f, 0.f}, 
-            0.0f, 
+            (Rectangle){ ZERO, ZERO, rendermgr->game_size.x, -rendermgr->game_size.y }, 
+            (Rectangle){ ZERO, ZERO, rendermgr->monitor_size.x, rendermgr->monitor_size.y },
+            (Vector2) {ZERO, ZERO}, 
+            ZERO, 
             WHITE);
     EndDrawing();
 }

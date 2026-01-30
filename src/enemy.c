@@ -54,7 +54,7 @@ void GenerateEnemyProjectiles(enemygroup_t *enemymgr, projectilegroup_t *project
 
     switch (new_projectile.type) {
         case SINGLE:
-            new_projectile.move = (Vector2) { 0.f, 2.f};
+            new_projectile.move = (Vector2) { 0.f, 1.f};
             new_projectile.pos.x = enemy_pos.x+8;
             new_projectile.pos.y = enemy_pos.y+ENEMY_HEIGHT;
             projectilemgr->projectiles[new_proj_idx] = new_projectile;

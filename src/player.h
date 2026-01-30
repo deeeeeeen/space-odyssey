@@ -14,6 +14,7 @@ typedef struct projectilegroup_s projectilegroup_t;
 typedef struct cutscene {
     bool        active;
     float       timer;
+    float       framedelta;
     bool        done;
 } cutscene;
 
@@ -23,6 +24,7 @@ typedef struct player_s {
     float       speed;
     int         health;
     int         projectile_type;
+    float       deltaframe;
     cutscene    in_cutscene;
 } player_t;
 

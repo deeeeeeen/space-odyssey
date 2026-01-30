@@ -2,12 +2,9 @@
 #define PORJECTILE_H
 
 #include "raylib.h"
+#include "globals.h"
 
 #define MAX_PROJECTILES     100
-#define GAME_WIDTH          512
-#define GAME_HEIGHT         288
-
-
 
 enum projectile_type {
     SINGLE,
@@ -26,9 +23,11 @@ typedef struct projectile_s {
 typedef struct projectilegroup_s {
     projectile_t    projectiles[MAX_PROJECTILES];
     int             projectile_count;
+    float           framedelta;
 } projectilegroup_t;
 
 int ReturnEmptyProjectileIdx(projectilegroup_t *projectilemgr);
+Color ProjColorType(projectile_t *projectile);
 void UpdateProjectiles(projectilegroup_t *projectilemgr);
 
 #endif

@@ -62,7 +62,8 @@ void InitPlayer(player_t *playermgr) {
 
 void InitCutscene(player_t *playermgr) {
     if (!playermgr->in_cutscene.active) return;
-    playermgr->in_cutscene.timer += GetFrameTime();
+    playermgr->in_cutscene.framedelta = GetFrameTime();
+    playermgr->in_cutscene.timer += playermgr->in_cutscene.framedelta;
     if (playermgr->in_cutscene.timer < 5+(2.5/60)) return;
     if (IsKeyPressed(KEY_Q) && playermgr->pos.y == GAME_HEIGHT-PLAYER_HEIGHT-3*16-1) {
         playermgr->in_cutscene.done = true;
@@ -70,31 +71,21 @@ void InitCutscene(player_t *playermgr) {
     }
 
     if (!playermgr->in_cutscene.done) {
-
-        float timer = playermgr->in_cutscene.timer-(5+(2.5/60));
-        
-        if (timer > 2.5/60) {
-            playermgr->in_cutscene.timer = 5+(2.5/60);
-            if (playermgr->pos.y != GAME_HEIGHT-PLAYER_HEIGHT-3*16-1) {
-                playermgr->pos.y--;
-                if (playermgr->pos.y <= GAME_HEIGHT-PLAYER_HEIGHT-3*16-1) {
-                    playermgr->pos.y = GAME_HEIGHT-PLAYER_HEIGHT-3*16-1;
-                }
+        playermgr->in_cutscene.timer = 5+(2.5/60);
+        if (playermgr->pos.y != GAME_HEIGHT-PLAYER_HEIGHT-3*16-1) {
+            playermgr->pos.y -= 30*playermgr->in_cutscene.framedelta;
+            if (playermgr->pos.y <= GAME_HEIGHT-PLAYER_HEIGHT-3*16-1) {
+                playermgr->pos.y = GAME_HEIGHT-PLAYER_HEIGHT-3*16-1;
             }
         }
     }
     else if (playermgr->in_cutscene.done) {
-
-        float timer = playermgr->in_cutscene.timer-(5+(2.5/60));
-
-        if (timer > 2.5/60) {
-            playermgr->in_cutscene.timer = 5+(2.5/60);
-            if (playermgr->pos.y != GAME_HEIGHT-PLAYER_HEIGHT-1) {
-                playermgr->pos.y++;
-                if (playermgr->pos.y >= GAME_HEIGHT-PLAYER_HEIGHT-1) {
-                    playermgr->pos.y = GAME_HEIGHT-PLAYER_HEIGHT-1;
-                    playermgr->in_cutscene.active = true;
-                }
+        playermgr->in_cutscene.timer = 5+(2.5/60);
+        if (playermgr->pos.y != GAME_HEIGHT-PLAYER_HEIGHT-1) {
+            playermgr->pos.y += 30*playermgr->in_cutscene.framedelta;
+            if (playermgr->pos.y >= GAME_HEIGHT-PLAYER_HEIGHT-1) {
+                playermgr->pos.y = GAME_HEIGHT-PLAYER_HEIGHT-1;
+                playermgr->in_cutscene.active = true;
             }
         }
     }
@@ -102,13 +93,13 @@ void InitCutscene(player_t *playermgr) {
 
 void UpdatePosition(player_t *playermgr) {
     if (IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT)) {
-        playermgr->pos.x -= playermgr->speed;
+        playermgr->pos.x -= playermgr->speed*playermgr->deltaframe*60;
         if (playermgr->pos.x < 69) {
             playermgr->pos.x = 69;
         }
     }
     if (IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT)) {
-        playermgr->pos.x += playermgr->speed;
+        playermgr->pos.x += playermgr->speed*playermgr->deltaframe*60;
         if (playermgr->pos.x > GAME_WIDTH-69-PLAYER_WIDTH) {
             playermgr->pos.x = GAME_WIDTH-69-PLAYER_WIDTH;
         }
@@ -116,9 +107,9 @@ void UpdatePosition(player_t *playermgr) {
 }
 
 void UpdatePlayerInput(player_t *playermgr, projectilegroup_t *projectilemgr) {
+    playermgr->deltaframe = GetFrameTime();
     InitCutscene(playermgr);
     UpdatePosition(playermgr);
-    if (playermgr->in_cutscene.active) return;
     GeneratePlayerProjectiles(playermgr, projectilemgr);
 }
 
