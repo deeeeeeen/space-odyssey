@@ -61,7 +61,7 @@ void DrawStars(stargroup_t *starmgr) {
     starmgr->backdrop = LoadRenderTexture(GAME_WIDTH, GAME_HEIGHT);
 
     BeginTextureMode(starmgr->backdrop);
-        ClearBackground((Color)SPACE_COLOR);
+        ClearBackground(SPACE_COLOR);
         for (int i = ZERO; i < MAX_STARS; i++) {
             for (int j = ZERO; j < THREEBYTHREE; j++) {
                 DrawPixelV(starmgr->group[i].atls[j], starmgr->group[i].clr[j]);

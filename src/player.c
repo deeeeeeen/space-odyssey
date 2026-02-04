@@ -60,18 +60,29 @@ void InitPlayer(player_t *playermgr) {
     TraceLog(LOG_INFO, "PLAYER: Initialised!");
 }
 
-void InitCutscene(player_t *playermgr) {
+bool IsPlayerInCutscenePos(player_t *playermgr) {
+    return playermgr->pos.y == GAME_HEIGHT-PLAYER_HEIGHT-3*16-1 && playermgr->in_cutscene.active;
+} 
+
+void AssumePlayerCutscenePos(player_t *playermgr) {
     if (!playermgr->in_cutscene.active) return;
     playermgr->in_cutscene.framedelta = GetFrameTime();
-    playermgr->in_cutscene.timer += playermgr->in_cutscene.framedelta;
-    if (playermgr->in_cutscene.timer < 5+(2.5/60)) return;
-    if (IsKeyPressed(KEY_Q) && playermgr->pos.y == GAME_HEIGHT-PLAYER_HEIGHT-3*16-1) {
+    if (playermgr->pos.y != GAME_HEIGHT-PLAYER_HEIGHT-3*16-1) {
+        playermgr->pos.y -= 30*playermgr->in_cutscene.framedelta;
+        if (playermgr->pos.y <= GAME_HEIGHT-PLAYER_HEIGHT-3*16-1) {
+            playermgr->pos.y = GAME_HEIGHT-PLAYER_HEIGHT-3*16-1;
+        }
+    }
+}
+
+void InitPlayerInCutscene(player_t *playermgr) {
+    if (!playermgr->in_cutscene.active) return;
+    playermgr->in_cutscene.framedelta = GetFrameTime();
+    if (IsKeyPressed(KEY_ENTER) && playermgr->pos.y == GAME_HEIGHT-PLAYER_HEIGHT-3*16-1) {
         playermgr->in_cutscene.done = true;
-        playermgr->in_cutscene.timer = 5+(2.5/60);
     }
 
     if (!playermgr->in_cutscene.done) {
-        playermgr->in_cutscene.timer = 5+(2.5/60);
         if (playermgr->pos.y != GAME_HEIGHT-PLAYER_HEIGHT-3*16-1) {
             playermgr->pos.y -= 30*playermgr->in_cutscene.framedelta;
             if (playermgr->pos.y <= GAME_HEIGHT-PLAYER_HEIGHT-3*16-1) {
@@ -80,7 +91,6 @@ void InitCutscene(player_t *playermgr) {
         }
     }
     else if (playermgr->in_cutscene.done) {
-        playermgr->in_cutscene.timer = 5+(2.5/60);
         if (playermgr->pos.y != GAME_HEIGHT-PLAYER_HEIGHT-1) {
             playermgr->pos.y += 30*playermgr->in_cutscene.framedelta;
             if (playermgr->pos.y >= GAME_HEIGHT-PLAYER_HEIGHT-1) {
@@ -108,7 +118,7 @@ void UpdatePosition(player_t *playermgr) {
 
 void UpdatePlayerInput(player_t *playermgr, projectilegroup_t *projectilemgr) {
     playermgr->deltaframe = GetFrameTime();
-    InitCutscene(playermgr);
+    InitPlayerInCutscene(playermgr);
     UpdatePosition(playermgr);
     GeneratePlayerProjectiles(playermgr, projectilemgr);
 }

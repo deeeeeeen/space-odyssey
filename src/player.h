@@ -30,5 +30,7 @@ typedef struct player_s {
 
 void InitPlayer(player_t *playermgr);
 void UpdatePlayer(player_t *playermgr, projectilegroup_t *projectilemgr);
+void AssumePlayerCutscenePos(player_t *playermgr);
+bool IsPlayerInCutscenePos(player_t *playermgr);
 
 #endif

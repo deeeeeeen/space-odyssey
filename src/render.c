@@ -48,54 +48,49 @@ void InitRender(render_t *rendermgr) {
 
     rendermgr->monitor_size = (Vector2) { GetMonitorWidth(GetCurrentMonitor()), GetMonitorHeight(GetCurrentMonitor()) };
     rendermgr->characters = LoadTexture("res/characters.png");
-
-    rendermgr->cutscene.top_bar = (Rectangle) { 69.f, 
-                                                -48.f, 
-                                                rendermgr->game_size.x-69*2,
-                                                48.f };
-    rendermgr->cutscene.bottom_bar = (Rectangle) { 69.f, 
-                                                rendermgr->game_size.y, 
-                                                rendermgr->game_size.x-69*2, 
-                                                48.f };
-
                                                 
     InitStars(&rendermgr->stars);
     DrawStars(&rendermgr->stars);
     InitSidebar(&rendermgr->gui);
+    InitCutscene(&rendermgr->cutscene);
+
+    InitMainMenu(&rendermgr->main_menu);
 
     TraceLog(LOG_INFO, "RENDER: Initialised!");
 }
 
-void DrawCutscene(render_t *rendermgr, player_t *playermgr, enemygroup_t *enemymgr) {
-    if (!enemymgr->clear) return;
-    playermgr->in_cutscene.active = true;
-    rendermgr->cutscene.timer += GetFrameTime();
+void DrawCutscene(cutscene_t *cutscenemgr, player_t *playermgr) {
+    if (!playermgr->in_cutscene.active) return;
 
     if (!playermgr->in_cutscene.done) {
-        if (rendermgr->cutscene.timer >= 5) {
-            rendermgr->cutscene.framedelta = GetFrameTime();
-            rendermgr->cutscene.timer = 5;
-            if (rendermgr->cutscene.displacement < 48) {
-                rendermgr->cutscene.displacement += 30*rendermgr->cutscene.framedelta;
-                rendermgr->cutscene.top_bar.y += 30*rendermgr->cutscene.framedelta;
-                rendermgr->cutscene.bottom_bar.y -= 30*rendermgr->cutscene.framedelta;
-            }
-        }
+        StartCutscene(cutscenemgr);
     }
-    if (playermgr->in_cutscene.done) {
-        rendermgr->cutscene.timer = 5;
-        if (rendermgr->cutscene.displacement > 0) {
-            rendermgr->cutscene.displacement -= 30*rendermgr->cutscene.framedelta;
-            rendermgr->cutscene.top_bar.y -= 30*rendermgr->cutscene.framedelta;
-            rendermgr->cutscene.bottom_bar.y  += 30*rendermgr->cutscene.framedelta;
-        }
-        else {
-            enemymgr->clear = false;
-            playermgr->in_cutscene.active = false;
-        }
+    else if (playermgr->in_cutscene.done) {
+        EndCutscene(cutscenemgr);
     }
-    DrawRectangleRec(rendermgr->cutscene.top_bar, BLACK);
-    DrawRectangleRec(rendermgr->cutscene.bottom_bar, BLACK);
+
+    DrawRectangleRec(cutscenemgr->top_bar, BLACK);
+    DrawRectangleRec(cutscenemgr->bottom_bar, BLACK);
+}
+
+void RenderTitle(render_t *rendermgr, frame_t *framemgr) {
+    BeginTextureMode(rendermgr->target);
+        ClearBackground(BLACK);
+        BeginMode2D(framemgr->camera);
+            DrawTexture(rendermgr->stars.backdrop.texture, 0, 0, WHITE);
+            DrawSideBar(&rendermgr->gui);
+            DrawMainMenu(&rendermgr->main_menu);
+        EndMode2D();
+    EndTextureMode();
+
+    BeginDrawing();
+        DrawTexturePro(rendermgr->target.texture, 
+            (Rectangle){ ZERO, ZERO, rendermgr->game_size.x, -rendermgr->game_size.y }, 
+            (Rectangle){ ZERO, ZERO, rendermgr->monitor_size.x, rendermgr->monitor_size.y },
+            (Vector2) {ZERO, ZERO}, 
+            ZERO, 
+            WHITE);
+    EndDrawing();
 }
 
 void RenderWindow(render_t *rendermgr, frame_t *framemgr, player_t *playermgr, enemygroup_t *enemymgr, projectilegroup_t *projectilemgr) {
@@ -107,7 +102,7 @@ void RenderWindow(render_t *rendermgr, frame_t *framemgr, player_t *playermgr, e
             DrawEnemies(rendermgr, enemymgr);
             DrawProjectiles(projectilemgr);
             DrawSideBar(&rendermgr->gui);
-            DrawCutscene(rendermgr, playermgr, enemymgr);
+            DrawCutscene(&rendermgr->cutscene, playermgr);
         EndMode2D();
     EndTextureMode();
 

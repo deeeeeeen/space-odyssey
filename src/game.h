@@ -1,6 +1,8 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include "main-menu.h"
+#include "state.h"
 #include "render.h"
 #include "frame.h"
 #include "player.h"
@@ -14,6 +16,8 @@
 #define GAME_TITLE         "space odyssey"
 #define GAME_FPS           60
 
+typedef struct state_s              state_t;
+typedef struct mainmenu_s           mainmenu_t;
 typedef struct render_s             render_t;
 typedef struct player_s             player_t;
 typedef struct enemygroup_s         enemygroup_t;
@@ -21,6 +25,7 @@ typedef struct frame_s              frame_t;
 typedef struct projectilegroup_s    projectilegroup_t;
 
 typedef struct game_s {
+    state_t                 statemgr;
     render_t                rendermgr;
     frame_t                 framemgr;
     player_t                playermgr;
