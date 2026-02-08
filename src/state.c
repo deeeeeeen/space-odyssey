@@ -1,6 +1,6 @@
 #include "state.h"
 
-void UpdateCursor(state_t *statemgr, mainmenu_t *mainmenumgr) {
+void UpdateMainMenuCursor(state_t *statemgr, mainmenu_t *mainmenumgr) {
     
     if (IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_S)) {
         switch ((int)mainmenumgr->cursor_pos.y ) {
@@ -35,6 +35,42 @@ void UpdateCursor(state_t *statemgr, mainmenu_t *mainmenumgr) {
     }
 }
 
+void UpdatePauseMenuCursor(state_t *statemgr, pause_menu_t *pausemenumgr) {
+    
+    if (IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_S)) {
+        switch ((int)pausemenumgr->cursor_pos.y ) {
+            case PM_CURSOR_RESUME_POS:
+                pausemenumgr->cursor_pos.y += PM_DIST_BETWEEN_CHOICES;
+                break;
+            case PM_CURSOR_EXIT_POS:
+                pausemenumgr->cursor_pos.y -= PM_DIST_BETWEEN_CHOICES;
+                break;
+        }
+    }
+    else if (IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W)) {
+        switch ((int)pausemenumgr->cursor_pos.y) {
+            case PM_CURSOR_RESUME_POS:
+                pausemenumgr->cursor_pos.y += PM_DIST_BETWEEN_CHOICES;
+                break;
+            case PM_CURSOR_EXIT_POS:
+                pausemenumgr->cursor_pos.y -= PM_DIST_BETWEEN_CHOICES;
+                break;
+        }
+    }
+
+    if (IsKeyPressed(KEY_ENTER)) {
+        switch ((int)pausemenumgr->cursor_pos.y) {
+            case PM_CURSOR_RESUME_POS:
+            //UnloadRenderTexture(statemgr->pause_tex);
+                statemgr->state = GAME;
+                break;
+            case PM_CURSOR_EXIT_POS:
+                statemgr->state = EXIT;
+                break;
+        }
+    }
+}
+
 void StartGame(state_t *statemgr, mainmenu_t *mainmenumgr, player_t *playermgr) {
     if (IsTitleGone(mainmenumgr)) {
         playermgr->in_cutscene.framedelta = GetFrameTime();
@@ -53,8 +89,9 @@ void StartGame(state_t *statemgr, mainmenu_t *mainmenumgr, player_t *playermgr) 
 }
 
 void EndGame(state_t *statemgr, player_t *playermgr) {
-    if (IsKeyPressed(KEY_ESCAPE)) {
-        statemgr->state = EXIT;
+    if (IsKeyPressed(KEY_ESCAPE) && statemgr->state == GAME) {
+        statemgr->pause_tex = LoadRenderTexture(GAME_WIDTH, GAME_HEIGHT);
+        statemgr->state = PAUSE;
     }
     if (playermgr->health <= 0) {
         statemgr->state = EXIT;

@@ -39,7 +39,7 @@ void RunGame(game_t *gamemgr) {
     {
         switch (gamemgr->statemgr.state) {
             case TITLE_SCREEN:
-                UpdateCursor(&gamemgr->statemgr, &gamemgr->rendermgr.main_menu);
+                UpdateMainMenuCursor(&gamemgr->statemgr, &gamemgr->rendermgr.main_menu);
                 RenderTitle(&gamemgr->rendermgr, &gamemgr->framemgr, &gamemgr->playermgr);
                 FadeAwayTitle(&gamemgr->rendermgr.main_menu);
                 StartGame(&gamemgr->statemgr, &gamemgr->rendermgr.main_menu, &gamemgr->playermgr);
@@ -56,9 +56,8 @@ void RunGame(game_t *gamemgr) {
                 EndGame(&gamemgr->statemgr, &gamemgr->playermgr);
                 break;
             case PAUSE:
-                // TODO: draw gui while everything else is frozen
-                // ---
-                RenderWindow(&gamemgr->rendermgr, &gamemgr->framemgr, &gamemgr->playermgr, &gamemgr->enemymgr, &gamemgr->projectilemgr);
+                UpdatePauseMenuCursor(&gamemgr->statemgr, &gamemgr->rendermgr.gui.pause_menu);
+                RenderPauseMenu(&gamemgr->rendermgr, &gamemgr->framemgr, &gamemgr->statemgr);
                 break;
         }
     }

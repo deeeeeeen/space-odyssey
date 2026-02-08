@@ -14,8 +14,10 @@
 #include "player.h"
 #include "enemy.h"
 #include "projectile.h"
+#include "state.h"
 
 typedef struct game_s               game_t;
+typedef struct state_s              state_t;
 typedef struct hud_s                hud_t;
 typedef struct cutscene_s           cutscene_t;
 typedef struct mainmenu_s           mainmenu_t;
@@ -42,6 +44,7 @@ typedef struct render_s {
 
 void InitRender(render_t *rendermgr);
 void RenderTitle(render_t *rendermgr, frame_t *framemgr, player_t *playermgr);
+void RenderPauseMenu(render_t *rendermgr, frame_t *framemgr, state_t *statemgr);
 void RenderWindow(render_t *rendermgr, frame_t *framemgr, player_t *playermgr, enemygroup_t *enemymgr, projectilegroup_t *projectilemgr);
 
 #endif

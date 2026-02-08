@@ -7,7 +7,7 @@
 
 #define MAIN_MENU_SPRITE_PATH       (const char*)"res/main-menu.png"
 #define CURSOR_START_POS            179
-#define CURSOR_EXIT_POS             198
+#define CURSOR_EXIT_POS             199
 #define DIST_BETWEEN_CHOICES        CURSOR_EXIT_POS-CURSOR_START_POS
 
 typedef struct mainmenu_s {

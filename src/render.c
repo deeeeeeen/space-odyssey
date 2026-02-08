@@ -36,10 +36,10 @@ void DrawProjectiles(projectilegroup_t *projectilemgr) {
 void DrawSideBar(gui_t *guimgr) {
     UpdateSidebar(guimgr);
 
-    DrawTextureRec(guimgr->sidebars.sprite, guimgr->sidebars.base, guimgr->sidebars.base_pos_left, WHITE);
-    DrawTextureRec(guimgr->sidebars.sprite, guimgr->sidebars.base, guimgr->sidebars.base_pos_right, WHITE);
-    DrawTextureRec(guimgr->sidebars.sprite, guimgr->sidebars.frame, guimgr->sidebars.frame_pos_left, WHITE);
-    DrawTextureRec(guimgr->sidebars.sprite, guimgr->sidebars.frame, guimgr->sidebars.frame_pos_right, WHITE);
+    DrawTextureRec(guimgr->spritemap, guimgr->sidebars.base, guimgr->sidebars.base_pos_left, WHITE);
+    DrawTextureRec(guimgr->spritemap, guimgr->sidebars.base, guimgr->sidebars.base_pos_right, WHITE);
+    DrawTextureRec(guimgr->spritemap, guimgr->sidebars.frame, guimgr->sidebars.frame_pos_left, WHITE);
+    DrawTextureRec(guimgr->spritemap, guimgr->sidebars.frame, guimgr->sidebars.frame_pos_right, WHITE);
 }
 
 void InitRender(render_t *rendermgr) {
@@ -53,7 +53,7 @@ void InitRender(render_t *rendermgr) {
                                                 
     InitStars(&rendermgr->stars);
     DrawStars(&rendermgr->stars);
-    InitSidebar(&rendermgr->gui);
+    InitGui(&rendermgr->gui);
     InitCutscene(&rendermgr->cutscene);
     InitHud(&rendermgr->hud);
 
@@ -135,6 +135,29 @@ void DrawHud(hud_t *hudmgr, player_t *playermgr) {
     DrawTextureRec(hudmgr->sprite, (Rectangle) { 8*(int)((playermgr->score/10)%10), 0, 8, 7 }, (Vector2) { 490, 43 }, WHITE);
     DrawTextureRec(hudmgr->sprite, (Rectangle) { (playermgr->score%10), 0, 8, 7 }, (Vector2) { 498, 43 }, WHITE);
     // ----------------
+}
+
+void DrawGui(gui_t *guimgr) {
+    DrawTextureRec(guimgr->spritemap, guimgr->pause_menu.window_rec, guimgr->pause_menu.window_pos, WHITE);
+    DrawTextureRec(guimgr->spritemap, guimgr->pause_menu.cursor_rec, guimgr->pause_menu.cursor_pos, WHITE);
+}
+
+void RenderPauseMenu(render_t *rendermgr, frame_t *framemgr, state_t *statemgr) {
+    BeginTextureMode(rendermgr->target);
+        BeginMode2D(framemgr->camera);
+            DrawTexture(statemgr->pause_tex.texture, 0, 0, WHITE);
+            DrawGui(&rendermgr->gui);
+        EndMode2D();
+    EndTextureMode();
+
+    BeginDrawing();
+        DrawTexturePro(rendermgr->target.texture, 
+            (Rectangle){ ZERO, ZERO, rendermgr->game_size.x, -rendermgr->game_size.y }, 
+            (Rectangle){ ZERO, ZERO, rendermgr->monitor_size.x, rendermgr->monitor_size.y },
+            (Vector2) {ZERO, ZERO}, 
+            ZERO, 
+            WHITE);
+    EndDrawing();
 }
 
 void RenderTitle(render_t *rendermgr, frame_t *framemgr, player_t *playermgr) {

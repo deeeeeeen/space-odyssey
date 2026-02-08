@@ -6,13 +6,13 @@ void InitMainMenu(mainmenu_t *menumgr) {
     menumgr->title_rec = (Rectangle){ 0, 0, 178, 111 };
     menumgr->title_pos = (Vector2){ GAME_WIDTH/2 - menumgr->title_rec.width/2, GAME_HEIGHT/2 - menumgr->title_rec.height };
 
-    menumgr->choices_rec = (Rectangle){ 0, 111, 178, 26 };
+    menumgr->choices_rec = (Rectangle){ 0, 111, 178, 27 };
     menumgr->choices_pos = (Vector2){ GAME_WIDTH/2 - menumgr->choices_rec.width/2, GAME_HEIGHT*((float)4/6) - menumgr->choices_rec.height/2 };
 
-    menumgr->credits_rec = (Rectangle){ 0, 137, 178, 7 };
+    menumgr->credits_rec = (Rectangle){ 0, 138, 178, 7 };
     menumgr->credits_pos = (Vector2){ GAME_WIDTH/2 - menumgr->credits_rec.width/2, GAME_HEIGHT - menumgr->credits_rec.height*1.5 };
 
-    menumgr->cursor_rec = (Rectangle){ 0, 144, 4, 7 };
+    menumgr->cursor_rec = (Rectangle){ 0, 145, 8, 7 };
     menumgr->cursor_pos = (Vector2){ 221, 179 };
 
     menumgr->textcolor = (Color)WHITE;
