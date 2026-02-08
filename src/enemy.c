@@ -10,7 +10,7 @@ void PrepareLevel1Enemies(enemygroup_t *enemymgr) {
 
     for (int enemy_idx = 0; enemy_idx < MAX_ENEMIES; enemy_idx++) {
         enemymgr->enemies[enemy_idx].sprite_rec = (Rectangle) { ENEMY_WIDTH, 0.f, ENEMY_WIDTH, ENEMY_HEIGHT };
-        enemymgr->enemies[enemy_idx].pos = (Vector2) { (GAME_WIDTH-20*ENEMY_WIDTH)/2 + ENEMY_WIDTH*(enemy_idx%20), ENEMY_HEIGHT + ((int)(enemy_idx/20))*ENEMY_HEIGHT };
+        enemymgr->enemies[enemy_idx].pos = (Vector2) { (GAME_WIDTH-20*ENEMY_WIDTH)/2 + ENEMY_WIDTH*(enemy_idx%20), -(MAX_ENEMIES/20)*ENEMY_HEIGHT + ((int)(enemy_idx/20))*ENEMY_HEIGHT };
         enemymgr->enemies[enemy_idx].health = 1;
         enemymgr->enemies[enemy_idx].speed = 0;
         enemymgr->enemies[enemy_idx].level = 1;
@@ -83,13 +83,7 @@ void Level1Behaviour(enemygroup_t *enemymgr, projectilegroup_t *projectilemgr) {
     * 
     */
 
-    enemymgr->clear = true;
-    for (int i = 0; i < enemymgr->enemy_count; i++) {
-        if (enemymgr->enemies[i].alive) {
-            enemymgr->clear = false;
-            break;
-        }
-    }
+    enemymgr->clear = ReturnAliveEnemies(enemymgr) == 0;
 
     if (!enemymgr->clear) {
         enemymgr->timer += GetFrameTime();
@@ -100,7 +94,7 @@ void Level1Behaviour(enemygroup_t *enemymgr, projectilegroup_t *projectilemgr) {
             GenerateEnemyProjectiles(enemymgr, projectilemgr);
         }
 
-        if (enemymgr->timer >= 2) {
+        if (enemymgr->timer >= 1) {
             enemymgr->timer = 0;
 
             switch(enemymgr->level1.dirs[enemymgr->level1.dir_idx]) {

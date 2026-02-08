@@ -9,9 +9,14 @@ void InitCutscene(cutscene_t *cutscenemgr) {
                                                 GAME_HEIGHT, 
                                                 GAME_WIDTH-69*2, 
                                                 48.f };
+    cutscenemgr->active = true;
 }
 
-void StartCutscene(cutscene_t *cutscenemgr) {
+bool WaitUntilCombatStarts(cutscene_t *cutscenemgr) {
+    return !cutscenemgr->active;
+}
+
+void StartCutscene(cutscene_t *cutscenemgr, str8_t *string) {
     cutscenemgr->framedelta = GetFrameTime();
 
     if (cutscenemgr->displacement < 48) {
@@ -22,6 +27,10 @@ void StartCutscene(cutscene_t *cutscenemgr) {
     else {
         cutscenemgr->displacement = 48;
         cutscenemgr->framedelta = 0;
+        DrawDialogue(string, 80, GAME_HEIGHT-48+12);
+        if (IsDialogueDone(string)) {
+            cutscenemgr->done = true;
+        }
     }
 }
 
@@ -36,5 +45,6 @@ void EndCutscene(cutscene_t *cutscenemgr) {
     else {
         cutscenemgr->displacement = 0;
         cutscenemgr->framedelta = 0;
+        cutscenemgr->active = false;
     }
 }

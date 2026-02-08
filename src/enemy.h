@@ -45,10 +45,12 @@ typedef struct enemygroup_s {
     float       alive_count;
     float       timer;
     bool        clear;
+    bool        started;
     level1_t    level1;    
 } enemygroup_t;
 
 void InitEnemy(enemygroup_t *enemymgr);
 void UpdateEnemy(enemygroup_t *enemymgr, projectilegroup_t *projectilemgr);
+bool HasLevelStarted(enemygroup_t *enemymgr);
 
 #endif

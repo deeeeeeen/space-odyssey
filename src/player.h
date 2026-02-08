@@ -25,6 +25,7 @@ typedef struct player_s {
     int         health;
     int         projectile_type;
     float       deltaframe;
+    int         score;
     cutscene    in_cutscene;
 } player_t;
 

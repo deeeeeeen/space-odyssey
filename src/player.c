@@ -1,6 +1,7 @@
 #include "player.h"
 
 void GeneratePlayerProjectiles(player_t *playermgr, projectilegroup_t *projectilemgr) {
+    if (playermgr->in_cutscene.active) return;
     if (IsKeyPressed(KEY_LEFT_CONTROL)) {
         int new_proj_idx = ReturnEmptyProjectileIdx(projectilemgr);
 
@@ -53,34 +54,16 @@ void GeneratePlayerProjectiles(player_t *playermgr, projectilegroup_t *projectil
 
 void InitPlayer(player_t *playermgr) {
     playermgr->sprite_rec   = (Rectangle) { 0.f, 0.f, PLAYER_WIDTH, PLAYER_HEIGHT };
-    playermgr->pos          = (Vector2) { GAME_WIDTH/2, GAME_HEIGHT-PLAYER_HEIGHT-1 };
+    playermgr->pos          = (Vector2) { GAME_WIDTH/2, GAME_HEIGHT };
     playermgr->speed        = GAME_WIDTH/(2*2*60); // move half of the screen in two seconds running the game at 60 fps
     playermgr->health = 3;
 
     TraceLog(LOG_INFO, "PLAYER: Initialised!");
 }
 
-bool IsPlayerInCutscenePos(player_t *playermgr) {
-    return playermgr->pos.y == GAME_HEIGHT-PLAYER_HEIGHT-3*16-1 && playermgr->in_cutscene.active;
-} 
-
-void AssumePlayerCutscenePos(player_t *playermgr) {
-    if (!playermgr->in_cutscene.active) return;
-    playermgr->in_cutscene.framedelta = GetFrameTime();
-    if (playermgr->pos.y != GAME_HEIGHT-PLAYER_HEIGHT-3*16-1) {
-        playermgr->pos.y -= 30*playermgr->in_cutscene.framedelta;
-        if (playermgr->pos.y <= GAME_HEIGHT-PLAYER_HEIGHT-3*16-1) {
-            playermgr->pos.y = GAME_HEIGHT-PLAYER_HEIGHT-3*16-1;
-        }
-    }
-}
-
 void InitPlayerInCutscene(player_t *playermgr) {
     if (!playermgr->in_cutscene.active) return;
     playermgr->in_cutscene.framedelta = GetFrameTime();
-    if (IsKeyPressed(KEY_ENTER) && playermgr->pos.y == GAME_HEIGHT-PLAYER_HEIGHT-3*16-1) {
-        playermgr->in_cutscene.done = true;
-    }
 
     if (!playermgr->in_cutscene.done) {
         if (playermgr->pos.y != GAME_HEIGHT-PLAYER_HEIGHT-3*16-1) {
@@ -95,7 +78,7 @@ void InitPlayerInCutscene(player_t *playermgr) {
             playermgr->pos.y += 30*playermgr->in_cutscene.framedelta;
             if (playermgr->pos.y >= GAME_HEIGHT-PLAYER_HEIGHT-1) {
                 playermgr->pos.y = GAME_HEIGHT-PLAYER_HEIGHT-1;
-                playermgr->in_cutscene.active = true;
+                playermgr->in_cutscene.active = false;
             }
         }
     }

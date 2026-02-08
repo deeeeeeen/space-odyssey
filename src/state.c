@@ -35,14 +35,28 @@ void UpdateCursor(state_t *statemgr, mainmenu_t *mainmenumgr) {
     }
 }
 
-void StartGame(state_t *statemgr, mainmenu_t *mainmenumgr) {
+void StartGame(state_t *statemgr, mainmenu_t *mainmenumgr, player_t *playermgr) {
     if (IsTitleGone(mainmenumgr)) {
-        statemgr->state = GAME;
+        playermgr->in_cutscene.framedelta = GetFrameTime();
+        if (playermgr->pos.y > GAME_HEIGHT-PLAYER_HEIGHT-1) {
+            playermgr->pos.y -= 30*playermgr->in_cutscene.framedelta;
+        }
+        else if (playermgr->pos.y <= GAME_HEIGHT-PLAYER_HEIGHT-1) {
+            playermgr->pos.y = GAME_HEIGHT-PLAYER_HEIGHT-1;
+            playermgr->in_cutscene.timer += playermgr->in_cutscene.framedelta;
+            if (playermgr->in_cutscene.timer >= 1) {
+                playermgr->in_cutscene.timer = 0;
+                statemgr->state = GAME;
+            }
+        }
     }
 }
 
-void EndGame(state_t *statemgr) {
+void EndGame(state_t *statemgr, player_t *playermgr) {
     if (IsKeyPressed(KEY_ESCAPE)) {
+        statemgr->state = EXIT;
+    }
+    if (playermgr->health <= 0) {
         statemgr->state = EXIT;
     }
 }

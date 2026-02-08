@@ -4,6 +4,7 @@
 #include "raylib.h"
 #include "raymath.h"
 #include "globals.h"
+#include "hud.h"
 #include "cutscene.h"
 #include "main-menu.h"
 #include "dialogue.h"
@@ -15,8 +16,9 @@
 #include "projectile.h"
 
 typedef struct game_s               game_t;
+typedef struct hud_s                hud_t;
 typedef struct cutscene_s           cutscene_t;
-typedef struct mainmenu_s               mainmenu_t;
+typedef struct mainmenu_s           mainmenu_t;
 typedef struct gui_s                gui_t;
 typedef struct stargroup_s          stargroup_t;
 typedef struct frame_s              frame_t;
@@ -25,7 +27,8 @@ typedef struct enemygroup_s         enemygroup_t;
 typedef struct projectilegroup_s    projectilegroup_t;
 
 typedef struct render_s {
-    mainmenu_t                  main_menu;
+    mainmenu_t              main_menu;
+    hud_t                   hud;
     gui_t                   gui;
     stargroup_t             stars;
     cutscene_t              cutscene;
@@ -38,7 +41,7 @@ typedef struct render_s {
 } render_t;
 
 void InitRender(render_t *rendermgr);
-void RenderTitle(render_t *rendermgr, frame_t *framemgr);
+void RenderTitle(render_t *rendermgr, frame_t *framemgr, player_t *playermgr);
 void RenderWindow(render_t *rendermgr, frame_t *framemgr, player_t *playermgr, enemygroup_t *enemymgr, projectilegroup_t *projectilemgr);
 
 #endif

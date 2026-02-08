@@ -40,20 +40,25 @@ void RunGame(game_t *gamemgr) {
         switch (gamemgr->statemgr.state) {
             case TITLE_SCREEN:
                 UpdateCursor(&gamemgr->statemgr, &gamemgr->rendermgr.main_menu);
-                RenderTitle(&gamemgr->rendermgr, &gamemgr->framemgr);
+                RenderTitle(&gamemgr->rendermgr, &gamemgr->framemgr, &gamemgr->playermgr);
                 FadeAwayTitle(&gamemgr->rendermgr.main_menu);
-                StartGame(&gamemgr->statemgr, &gamemgr->rendermgr.main_menu);
+                StartGame(&gamemgr->statemgr, &gamemgr->rendermgr.main_menu, &gamemgr->playermgr);
+                EndGame(&gamemgr->statemgr, &gamemgr->playermgr);
                 break;
             case GAME:
-                UpdatePlayer(&gamemgr->playermgr, &gamemgr->projectilemgr);   
-                UpdateEnemy(&gamemgr->enemymgr, &gamemgr->projectilemgr);
-                UpdateProjectiles(&gamemgr->projectilemgr);
-                ProjectileCollMgr(&gamemgr->projectilemgr, &gamemgr->enemymgr, &gamemgr->playermgr);
+                UpdatePlayer(&gamemgr->playermgr, &gamemgr->projectilemgr);
+                if (WaitUntilCombatStarts(&gamemgr->rendermgr.cutscene)) {
+                    UpdateEnemy(&gamemgr->enemymgr, &gamemgr->projectilemgr);
+                    UpdateProjectiles(&gamemgr->projectilemgr);
+                    ProjectileCollMgr(&gamemgr->projectilemgr, &gamemgr->enemymgr, &gamemgr->playermgr);
+                }
                 RenderWindow(&gamemgr->rendermgr, &gamemgr->framemgr, &gamemgr->playermgr, &gamemgr->enemymgr, &gamemgr->projectilemgr);
-                EndGame(&gamemgr->statemgr);
+                EndGame(&gamemgr->statemgr, &gamemgr->playermgr);
                 break;
             case PAUSE:
                 // TODO: draw gui while everything else is frozen
+                // ---
+                RenderWindow(&gamemgr->rendermgr, &gamemgr->framemgr, &gamemgr->playermgr, &gamemgr->enemymgr, &gamemgr->projectilemgr);
                 break;
         }
     }

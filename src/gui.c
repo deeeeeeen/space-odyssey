@@ -2,8 +2,8 @@
 
 void InitSidebar(gui_t *guimgr) {
     guimgr->sidebars.sprite = LoadTexture("res/gui.png");
-    guimgr->sidebars.base = (Rectangle) { 69.f, 0.f, 69.f, 320.f };
-    guimgr->sidebars.frame = (Rectangle) { 0.f, 0.f, 69.f, 320.f };
+    guimgr->sidebars.base = (Rectangle) { 68.f, 0.f, 68.f, 320.f };
+    guimgr->sidebars.frame = (Rectangle) { 0.f, 0.f, 68.f, 320.f };
 
     guimgr->sidebars.base_pos_left =   (Vector2) { ZERO, -(guimgr->sidebars.base.height-GAME_HEIGHT) };
     guimgr->sidebars.base_pos_right =  (Vector2) { GAME_WIDTH-guimgr->sidebars.base.width, -(guimgr->sidebars.base.height-GAME_HEIGHT) };

@@ -21,6 +21,7 @@ void ProjectileCollMgr(projectilegroup_t *projectilemgr, enemygroup_t *enemymgr,
                     if (enemymgr->enemies[enemy_idx].health <= 0) {
                         enemymgr->enemies[enemy_idx].alive = false;
                         enemymgr->alive_count--;
+                        playermgr->score += 100;
                     }
                 }
             }

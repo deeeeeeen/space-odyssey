@@ -1,5 +1,7 @@
 #include "render.h"
 
+str8_t introstr = STR8_LITR("[???]:    Hello, Nemo. I hope you woke up and have come to your\n             senses. The effects of cryogenic hibernation will wear\n             off shortly. \n[Nemo]: Yaaaaaawn. Somewhat. \n             The cryo sleep did a number on me. I feel miserable. \n             Yawn... \n            What's with the unscheduled awakening? \n[???]:    Forgive me, but I am in need of your assisance. We are\n            approaching a group of aliens!");
+
 void DrawPlayer(render_t *rendermgr, player_t *playermgr) {
     DrawTextureRec(rendermgr->characters, playermgr->sprite_rec, playermgr->pos, WHITE);
 }
@@ -53,33 +55,96 @@ void InitRender(render_t *rendermgr) {
     DrawStars(&rendermgr->stars);
     InitSidebar(&rendermgr->gui);
     InitCutscene(&rendermgr->cutscene);
+    InitHud(&rendermgr->hud);
 
     InitMainMenu(&rendermgr->main_menu);
 
     TraceLog(LOG_INFO, "RENDER: Initialised!");
 }
 
-void DrawCutscene(cutscene_t *cutscenemgr, player_t *playermgr) {
-    if (!playermgr->in_cutscene.active) return;
-
-    if (!playermgr->in_cutscene.done) {
-        StartCutscene(cutscenemgr);
+void DrawCutscene(cutscene_t *cutscenemgr, player_t *playermgr, str8_t *string) {
+    if (cutscenemgr->active) {
+        playermgr->in_cutscene.active = cutscenemgr->active;
     }
-    else if (playermgr->in_cutscene.done) {
-        EndCutscene(cutscenemgr);
+    if (!cutscenemgr->active) {
+        playermgr->in_cutscene.active = cutscenemgr->active;
+        return;
     }
-
+    playermgr->in_cutscene.done = cutscenemgr->done;
+    
     DrawRectangleRec(cutscenemgr->top_bar, BLACK);
     DrawRectangleRec(cutscenemgr->bottom_bar, BLACK);
+
+    if (!cutscenemgr->done) {
+        StartCutscene(cutscenemgr, string);
+    }
+    else if (cutscenemgr->done) {
+        EndCutscene(cutscenemgr);
+    }
 }
 
-void RenderTitle(render_t *rendermgr, frame_t *framemgr) {
+void DrawHud(hud_t *hudmgr, player_t *playermgr) {
+    // hp section
+    DrawRectangle(hudmgr->hp_pos.x, hudmgr->hp_pos.y, hudmgr->hp_box_size.x, playermgr->health * hudmgr->hp_box_size.y, BLACK);
+    for (int hcount = 0; hcount < playermgr->health; hcount++) {
+        DrawTextureRec(hudmgr->sprite, hudmgr->hp_rec, (Vector2) { hudmgr->hp_pos.x, hcount * hudmgr->hp_box_size.y + (hudmgr->hp_pos.y+3)}, WHITE);
+    }
+    // ----------
+    // playtime section
+    hudmgr->framedelta = GetFrameTime();
+    hudmgr->timer += hudmgr->framedelta;
+    if (hudmgr->timer >= 1) {
+        hudmgr->timer = 0;
+        hudmgr->playtime_s++;
+    }
+    DrawRectangleV(hudmgr->time_pos, hudmgr->time_box_size, BLACK);
+    if (hudmgr->playtime_s > 3600*9) {
+        DrawTextureRec(hudmgr->sprite, (Rectangle) { 72, 0, 8, 7 }, (Vector2) { 450, 7 }, WHITE);
+    }
+    else {
+        DrawTextureRec(hudmgr->sprite, (Rectangle) { ((hudmgr->playtime_s/3600)%9), 0, 8, 7 }, (Vector2) { 450, 7 }, WHITE);
+    }
+    DrawTextureRec(hudmgr->sprite, (Rectangle) { 72, 7, 8, 7 }, (Vector2) { 458, 7 }, WHITE);
+    DrawTextureRec(hudmgr->sprite, (Rectangle) { 8*(int)((hudmgr->playtime_s/600)%6), 0, 8, 7 }, (Vector2) { 466, 7 }, WHITE);
+    DrawTextureRec(hudmgr->sprite, (Rectangle) { 8*((hudmgr->playtime_s/60)%10), 0, 8, 7 }, (Vector2) { 474, 7 }, WHITE);
+    DrawTextureRec(hudmgr->sprite, (Rectangle) { 72, 7, 8, 7 }, (Vector2) { 482, 7 }, WHITE);
+    DrawTextureRec(hudmgr->sprite, (Rectangle) { 8*(int)((hudmgr->playtime_s/10)%6), 0, 8, 7 }, (Vector2) { 490, 7 }, WHITE);
+    DrawTextureRec(hudmgr->sprite, (Rectangle) { 8*(hudmgr->playtime_s%10), 0, 8, 7 }, (Vector2) { 498, 7 }, WHITE);
+    // ----------------
+    // level section
+    DrawRectangleV(hudmgr->lvl_pos, hudmgr->lvl_box_size, BLACK);
+    DrawTextureRec(hudmgr->sprite, hudmgr->lvl_rec, (Vector2) {hudmgr->lvl_pos.x, hudmgr->lvl_pos.y+3}, WHITE);
+    DrawTextureRec(hudmgr->sprite, (Rectangle) { 0, 0, 8, 7 }, (Vector2) { 482, 17 }, WHITE);
+    DrawTextureRec(hudmgr->sprite, (Rectangle) { 0, 0, 8, 7 }, (Vector2) { 490, 17 }, WHITE);
+    DrawTextureRec(hudmgr->sprite, (Rectangle) { 8, 0, 8, 7 }, (Vector2) { 498, 17 }, WHITE);
+    // ----------
+
+    // score section
+    DrawRectangleV(hudmgr->score_pos, hudmgr->score_box_size, BLACK);
+    DrawTextureRec(hudmgr->sprite, hudmgr->score_rec, (Vector2) {hudmgr->score_pos.x, hudmgr->score_pos.y+3}, WHITE);
+    if (playermgr->score > 9999999) {
+        DrawTextureRec(hudmgr->sprite, (Rectangle) { 72, 0, 8, 7 }, (Vector2) { 450, 43 }, WHITE);
+    }
+    else {
+        DrawTextureRec(hudmgr->sprite, (Rectangle) { 8*(int)((playermgr->score/1000000)%10), 0, 8, 7 }, (Vector2) { 450, 43 }, WHITE);
+    }
+    DrawTextureRec(hudmgr->sprite, (Rectangle) { 8*(int)((playermgr->score/100000)%10), 0, 8, 7 }, (Vector2) { 458, 43 }, WHITE);
+    DrawTextureRec(hudmgr->sprite, (Rectangle) { 8*(int)((playermgr->score/10000)%10), 0, 8, 7 }, (Vector2) { 466, 43 }, WHITE);
+    DrawTextureRec(hudmgr->sprite, (Rectangle) { 8*(int)((playermgr->score/1000)%10), 0, 8, 7 }, (Vector2) { 474, 43 }, WHITE);
+    DrawTextureRec(hudmgr->sprite, (Rectangle) { 8*(int)((playermgr->score/100)%10), 0, 8, 7 }, (Vector2) { 482, 43 }, WHITE);
+    DrawTextureRec(hudmgr->sprite, (Rectangle) { 8*(int)((playermgr->score/10)%10), 0, 8, 7 }, (Vector2) { 490, 43 }, WHITE);
+    DrawTextureRec(hudmgr->sprite, (Rectangle) { (playermgr->score%10), 0, 8, 7 }, (Vector2) { 498, 43 }, WHITE);
+    // ----------------
+}
+
+void RenderTitle(render_t *rendermgr, frame_t *framemgr, player_t *playermgr) {
     BeginTextureMode(rendermgr->target);
         ClearBackground(BLACK);
         BeginMode2D(framemgr->camera);
             DrawTexture(rendermgr->stars.backdrop.texture, 0, 0, WHITE);
             DrawSideBar(&rendermgr->gui);
             DrawMainMenu(&rendermgr->main_menu);
+            DrawPlayer(rendermgr, playermgr);
         EndMode2D();
     EndTextureMode();
 
@@ -102,7 +167,8 @@ void RenderWindow(render_t *rendermgr, frame_t *framemgr, player_t *playermgr, e
             DrawEnemies(rendermgr, enemymgr);
             DrawProjectiles(projectilemgr);
             DrawSideBar(&rendermgr->gui);
-            DrawCutscene(&rendermgr->cutscene, playermgr);
+            DrawHud(&rendermgr->hud, playermgr);
+            DrawCutscene(&rendermgr->cutscene, playermgr, &introstr);
         EndMode2D();
     EndTextureMode();
 

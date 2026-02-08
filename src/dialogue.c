@@ -1,31 +1,92 @@
 #include "dialogue.h"
 
-int str8_findnewl(str8 *s, int count) {
-    if (count < 1) return -1;
-
-    char *curr_char = s->str;
-    int curr_count = 0;
-    for (int pos = 0; pos < s->size; pos++) {
-        if (*(curr_char+pos) == '\n') {
-            curr_count++;
+int str8_strtvispos(str8_t *s) {
+    char *curr_char = s->str+s->curr_pos;
+    int count = 0;
+    for (int pos = 0; s->curr_pos-pos > 0; pos++) {
+        if (*(curr_char-pos) == '\n') {
+            count++;
         }
-        if (curr_count == count) {
-            return pos+1;
+        if (count > 1) {
+            return s->curr_pos-pos+1;
         }
     }
 }
 
-void DrawDialogue(str8 *string, int posx, int posy) {
-    string->delta += GetFrameTime();
-    if (IsKeyPressed(KEY_ENTER)) {
-        string->curr_pos = string->size;
+int str8_nlcount(str8_t *s) {
+    char *curr_char = s->str+s->curr_pos-1;
+    int nlcount = 0;
+    for (int pos = 0; s->curr_pos-pos > 0; pos++) {
+        if (*(curr_char-pos) == '\n') {
+            nlcount++;
+        }
     }
-    if (string->delta > 0.05) {
+    return nlcount;
+}
+
+int str8_findnextstop(str8_t *s) {
+    char *curr_char = s->str+s->curr_pos;
+    for (int pos = 0; pos < s->size; pos++) {
+        if (*(curr_char+pos) == '.' || *(curr_char+pos) == '?' || *(curr_char+pos) == '!') {
+            return pos;
+        }
+    }
+}
+
+bool IsDialogueDone(str8_t *string) {
+    return string->done;
+}
+
+int GetEndOfIdentifierPos(str8_t *string) {
+    char *curr_char = string->str+string->curr_pos;
+    for (int pos = 0; pos < string->size; pos++) {
+        if (*(curr_char+pos) == ']') {
+            return pos+2;
+        }
+    }
+}
+
+int GetEndOfSpaceFormatPos(str8_t *string) {
+    char *curr_char = string->str+string->curr_pos;
+    for (int pos = 0; pos < string->size; pos++) {
+        if (*(curr_char+pos) != ' ') {
+            return pos;
+        }
+    }
+}
+
+void DrawDialogue(str8_t *string, int posx, int posy) {
+    int startpos = 0;
+
+    if (string->curr_pos == string->size && IsKeyPressed(KEY_ENTER)) {
+        string->done = true;
+    }
+    string->delta += GetFrameTime();
+
+    if (string->str[string->curr_pos-1] == ' ' && string->str[string->curr_pos] == ' ') {
+        string->curr_pos += GetEndOfSpaceFormatPos(string);
+    }
+
+    if (string->str[string->curr_pos-1] == '[') {
+        string->curr_pos += GetEndOfIdentifierPos(string);
+    }
+
+    if (string->str[string->curr_pos-1] == '.' || string->str[string->curr_pos-1] == '?' || string->str[string->curr_pos-1] == '!') {
+        if (IsKeyPressed(KEY_ENTER)) {
+            string->curr_pos++;
+        }
+    }
+    else if (IsKeyPressed(KEY_ENTER) && (string->str[string->curr_pos-1] != '.' || string->str[string->curr_pos-1] != '?' || string->str[string->curr_pos-1] != '!')) {
+        string->curr_pos += str8_findnextstop(string);
+    }
+    else if (string->delta > 0.05) {
         string->delta = 0;
         string->curr_pos++;
         string->curr_pos = MIN(string->curr_pos, string->size);
     }
-    posy -= 6 * (string->curr_pos > str8_findnewl(string, 1) > 0 ? 1 : 0);
-    
-    DrawTextEx(dfont, STR8_SUBSTR(string, 0, string->curr_pos), (Vector2) { posx, posy }, dfont.baseSize, 0, WHITE);
+
+    if (str8_nlcount(string) > 1) {
+        startpos = str8_strtvispos(string);
+    }
+    DrawTextEx(dfont, STR8_SUBSTR(string, startpos, string->curr_pos-startpos), (Vector2) { posx, posy }, dfont.baseSize, 0, WHITE);
 }
