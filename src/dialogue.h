@@ -1,6 +1,9 @@
 #ifndef DIALOGUE_H
 #define DIALOGUE_H
 #include "raylib.h"
+#include "settings.h"
+#include "frame.h"
+#include "font.h"
 
 typedef struct str8_s {
     char*       str;
@@ -9,8 +12,6 @@ typedef struct str8_s {
     float       delta;
     bool        done;
 } str8_t;
-
-extern Font dfont;
 
 /**
  * @brief get the numerically smaller a or b

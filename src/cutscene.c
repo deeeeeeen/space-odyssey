@@ -1,14 +1,14 @@
 #include "cutscene.h"
 
 void InitCutscene(cutscene_t *cutscenemgr) {
-    cutscenemgr->top_bar = (Rectangle) { 69.f, 
-                                                -48.f, 
-                                                GAME_WIDTH-69*2,
-                                                48.f };
-    cutscenemgr->bottom_bar = (Rectangle) { 69.f, 
+    cutscenemgr->top_bar = (Rectangle) { SIDEBAR_WIDTH, 
+                                                -BAR_HEIGHT, 
+                                                GAME_WIDTH-2*SIDEBAR_WIDTH,
+                                                BAR_HEIGHT };
+    cutscenemgr->bottom_bar = (Rectangle) { SIDEBAR_WIDTH, 
                                                 GAME_HEIGHT, 
-                                                GAME_WIDTH-69*2, 
-                                                48.f };
+                                                GAME_WIDTH-2*SIDEBAR_WIDTH, 
+                                                BAR_HEIGHT };
     cutscenemgr->active = true;
 }
 
@@ -17,34 +17,35 @@ bool WaitUntilCombatStarts(cutscene_t *cutscenemgr) {
 }
 
 void StartCutscene(cutscene_t *cutscenemgr, str8_t *string) {
-    cutscenemgr->framedelta = GetFrameTime();
+    cutscenemgr->framedelta = FrameGetDelta();
 
-    if (cutscenemgr->displacement < 48) {
-        cutscenemgr->displacement += 30*cutscenemgr->framedelta;
-        cutscenemgr->top_bar.y += 30*cutscenemgr->framedelta;
-        cutscenemgr->bottom_bar.y -= 30*cutscenemgr->framedelta;
+    if (cutscenemgr->displacement < BAR_HEIGHT) {
+        cutscenemgr->displacement += BAR_HEIGHT/2*cutscenemgr->framedelta;
+        cutscenemgr->top_bar.y += BAR_HEIGHT/2*cutscenemgr->framedelta;
+        cutscenemgr->bottom_bar.y -= BAR_HEIGHT/2*cutscenemgr->framedelta;
     }
     else {
-        cutscenemgr->displacement = 48;
-        cutscenemgr->framedelta = 0;
-        DrawDialogue(string, 80, GAME_HEIGHT-48+12);
+        cutscenemgr->displacement = BAR_HEIGHT;
+        cutscenemgr->framedelta = ZERO;
+        DrawDialogue(string, SIDEBAR_WIDTH+BAR_HEIGHT/2.0+GetFont(DIALOGUE).baseSize/2.0, GAME_HEIGHT-BAR_HEIGHT/2.0-GetFont(DIALOGUE).baseSize/2.0);
         if (IsDialogueDone(string)) {
             cutscenemgr->done = true;
         }
     }
 }
 
-void EndCutscene(cutscene_t *cutscenemgr) {
-    cutscenemgr->framedelta = GetFrameTime();
+void EndCutscene(cutscene_t *cutscenemgr, str8_t *string) {
+    cutscenemgr->framedelta = FrameGetDelta();
 
-    if (cutscenemgr->displacement > 0) {
-        cutscenemgr->displacement -= 30*cutscenemgr->framedelta;
-        cutscenemgr->top_bar.y -= 30*cutscenemgr->framedelta;
-        cutscenemgr->bottom_bar.y  += 30*cutscenemgr->framedelta;
+    if (cutscenemgr->displacement > ZERO) {
+        cutscenemgr->displacement -= BAR_HEIGHT/2*cutscenemgr->framedelta;
+        cutscenemgr->top_bar.y -= BAR_HEIGHT/2*cutscenemgr->framedelta;
+        cutscenemgr->bottom_bar.y  += BAR_HEIGHT/2*cutscenemgr->framedelta;
+        DrawDialogue(string, SIDEBAR_WIDTH+BAR_HEIGHT/2.0+GetFont(DIALOGUE).baseSize/2.0, GAME_HEIGHT-BAR_HEIGHT/2.0-GetFont(DIALOGUE).baseSize/2.0 + (BAR_HEIGHT-cutscenemgr->displacement));
     }
     else {
-        cutscenemgr->displacement = 0;
-        cutscenemgr->framedelta = 0;
+        cutscenemgr->displacement = ZERO;
+        cutscenemgr->framedelta = ZERO;
         cutscenemgr->active = false;
     }
 }

@@ -1,8 +1,10 @@
 #ifndef HUD_H
 #define HUD_H
 #include "raylib.h"
+#include "frame.h"
+#include "globals.h"
 
-#define HUD_SPRITE_PATH "res/hud.png"
+#define HUD_SPRITE_PATH "res/graphic/hud.png"
 
 typedef struct hud_s {
     Texture2D       sprite;
@@ -28,6 +30,7 @@ typedef struct hud_s {
     float           timer;
 } hud_t;
 
+void UpdateHud(hud_t *hudmgr);
 void InitHud(hud_t *hudmgr);
 
 #endif

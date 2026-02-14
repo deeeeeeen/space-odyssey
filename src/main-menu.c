@@ -7,13 +7,13 @@ void InitMainMenu(mainmenu_t *menumgr) {
     menumgr->title_pos = (Vector2){ GAME_WIDTH/2 - menumgr->title_rec.width/2, GAME_HEIGHT/2 - menumgr->title_rec.height };
 
     menumgr->choices_rec = (Rectangle){ 0, 111, 178, 27 };
-    menumgr->choices_pos = (Vector2){ GAME_WIDTH/2 - menumgr->choices_rec.width/2, GAME_HEIGHT*((float)4/6) - menumgr->choices_rec.height/2 };
+    menumgr->choices_pos = (Vector2){ GAME_WIDTH/2 - menumgr->choices_rec.width/2, (int)(GAME_HEIGHT*((float)4/6) - menumgr->choices_rec.height/2) };
 
     menumgr->credits_rec = (Rectangle){ 0, 138, 178, 7 };
-    menumgr->credits_pos = (Vector2){ GAME_WIDTH/2 - menumgr->credits_rec.width/2, GAME_HEIGHT - menumgr->credits_rec.height*1.5 };
+    menumgr->credits_pos = (Vector2){ GAME_WIDTH/2 - menumgr->credits_rec.width/2, (int)(GAME_HEIGHT - menumgr->credits_rec.height*1.5) };
 
     menumgr->cursor_rec = (Rectangle){ 0, 145, 8, 7 };
-    menumgr->cursor_pos = (Vector2){ 221, 179 };
+    menumgr->cursor_pos = (Vector2){ menumgr->choices_pos.x+53, menumgr->choices_pos.y };
 
     menumgr->textcolor = (Color)WHITE;
 }
@@ -43,18 +43,18 @@ void DrawMainMenu(mainmenu_t *menumgr) {
 
 void FadeAwayTitle(mainmenu_t *menumgr) {
     if (!menumgr->pressed_start) return;
-    menumgr->frametime = GetFrameTime();
+    menumgr->frametime = FrameGetDelta();
     menumgr->timer += menumgr->frametime;
     if (menumgr->timer >= 0.2 && menumgr->textcolor.a > 0) {
         menumgr->timer = 0;
-        menumgr->textcolor.a -= 17;
+        menumgr->textcolor.a -= 255/15;
     }
 
-    if (menumgr->textcolor.a <= 0) {
-        menumgr->textcolor.a = 0;
+    if (menumgr->textcolor.a <= ZERO) {
+        menumgr->textcolor.a = ZERO;
     }
 }
 
 bool IsTitleGone(mainmenu_t *menumgr) {
-    return menumgr->textcolor.a <= 0 && menumgr->timer > 2;
+    return menumgr->textcolor.a <= ZERO && menumgr->timer > 2;
 }

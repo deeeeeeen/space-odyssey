@@ -58,10 +58,10 @@ int GetEndOfSpaceFormatPos(str8_t *string) {
 void DrawDialogue(str8_t *string, int posx, int posy) {
     int startpos = 0;
 
-    if (string->curr_pos == string->size && IsKeyPressed(KEY_ENTER)) {
+    if (string->curr_pos == string->size && IsKeyPressed(GetControl(C_CONFIRM))) {
         string->done = true;
     }
-    string->delta += GetFrameTime();
+    string->delta += FrameGetDelta();
 
     if (string->str[string->curr_pos-1] == ' ' && string->str[string->curr_pos] == ' ') {
         string->curr_pos += GetEndOfSpaceFormatPos(string);
@@ -72,21 +72,25 @@ void DrawDialogue(str8_t *string, int posx, int posy) {
     }
 
     if (string->str[string->curr_pos-1] == '.' || string->str[string->curr_pos-1] == '?' || string->str[string->curr_pos-1] == '!') {
-        if (IsKeyPressed(KEY_ENTER)) {
+        if (IsKeyPressed(GetControl(C_CONFIRM))) {
             string->curr_pos++;
         }
     }
-    else if (IsKeyPressed(KEY_ENTER) && (string->str[string->curr_pos-1] != '.' || string->str[string->curr_pos-1] != '?' || string->str[string->curr_pos-1] != '!')) {
+    else if (IsKeyPressed(GetControl(C_CONFIRM)) && (string->str[string->curr_pos-1] != '.' || string->str[string->curr_pos-1] != '?' || string->str[string->curr_pos-1] != '!')) {
         string->curr_pos += str8_findnextstop(string);
     }
-    else if (string->delta > 0.05) {
+    else if (string->delta > GetDialogueSpeed()) {
         string->delta = 0;
         string->curr_pos++;
         string->curr_pos = MIN(string->curr_pos, string->size);
     }
 
+    if (str8_nlcount(string) > 0) {
+        posy -= GetFont(DIALOGUE).baseSize/2.0;
+    }
     if (str8_nlcount(string) > 1) {
         startpos = str8_strtvispos(string);
     }
-    DrawTextEx(dfont, STR8_SUBSTR(string, startpos, string->curr_pos-startpos), (Vector2) { posx, posy }, dfont.baseSize, 0, WHITE);
+
+    DrawTextEx(GetFont(DIALOGUE), STR8_SUBSTR(string, startpos, string->curr_pos-startpos), (Vector2) { posx, posy }, GetFont(DIALOGUE).baseSize, 0, WHITE);
 }

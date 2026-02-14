@@ -2,12 +2,14 @@
 #define PLAYER_H
 
 #include "raylib.h"
+#include "settings.h"
+#include "frame.h"
 #include "projectile.h"
 
 #define PLAYER_WIDTH        17
 #define PLAYER_HEIGHT       16
-#define GAME_WIDTH          512
-#define GAME_HEIGHT         288
+#define GAME_WIDTH          640
+#define GAME_HEIGHT         360
 
 typedef struct projectilegroup_s projectilegroup_t;
 

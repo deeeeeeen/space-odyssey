@@ -86,10 +86,10 @@ void Level1Behaviour(enemygroup_t *enemymgr, projectilegroup_t *projectilemgr) {
     enemymgr->clear = ReturnAliveEnemies(enemymgr) == 0;
 
     if (!enemymgr->clear) {
-        enemymgr->timer += GetFrameTime();
-        enemymgr->level1.proj_delta += GetFrameTime();
+        enemymgr->timer += FrameGetDelta();
+        enemymgr->level1.proj_delta += FrameGetDelta();
 
-        if (enemymgr->level1.proj_delta >= .25*(1/(enemymgr->alive_count/100))) { // very dirty way of decreasing the rate of fire the lesser enemies are alive
+        if (enemymgr->level1.proj_delta >= .25*(1/(enemymgr->alive_count/MAX_ENEMIES))) { // very dirty way of decreasing the rate of fire the lesser enemies are alive
             enemymgr->level1.proj_delta = 0;
             GenerateEnemyProjectiles(enemymgr, projectilemgr);
         }

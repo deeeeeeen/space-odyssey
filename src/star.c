@@ -19,30 +19,24 @@ void GenerateStars(stargroup_t *starmgr) {
     
     switch (startype) {
         case DOT: {
-            star.clr[4] = WHITE;
+            star.clr[4] = NES_WHITE;
             break;
         }
         case DIAMOND: {
-            star.clr[1] = WHITE;
-            star.clr[3] = WHITE;
-            star.clr[4] = WHITE;
-            star.clr[5] = WHITE;
-            star.clr[7] = WHITE;
+            star.clr[1] = NES_WHITE;
+            star.clr[3] = NES_WHITE;
+            star.clr[4] = NES_WHITE;
+            star.clr[5] = NES_WHITE;
+            star.clr[7] = NES_WHITE;
             break;
         }
         case CROSS: {
-            star.clr[0] = WHITE;
-            star.clr[2] = WHITE;
-            star.clr[4] = WHITE;
-            star.clr[6] = WHITE;
-            star.clr[8] = WHITE;
+            star.clr[0] = NES_WHITE;
+            star.clr[2] = NES_WHITE;
+            star.clr[4] = NES_WHITE;
+            star.clr[6] = NES_WHITE;
+            star.clr[8] = NES_WHITE;
             break;
-        }
-    }
-
-    for (int i = ZERO; i < MAX_STARS; i++) {
-        for (int j = ZERO; j < THREEBYTHREE; j++) {
-            star.clr[j].a = GetRandomValue(ZERO, MAX_I8);
         }
     }
     

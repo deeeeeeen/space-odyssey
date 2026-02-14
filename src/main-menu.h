@@ -1,14 +1,13 @@
 #ifndef MAIN_MENU_H
 #define MAIN_MENU_H
 #include "raylib.h"
+#include "globals.h"
+#include "frame.h"
 
-#define GAME_WIDTH                  512
-#define GAME_HEIGHT                 288
-
-#define MAIN_MENU_SPRITE_PATH       (const char*)"res/main-menu.png"
-#define CURSOR_START_POS            179
-#define CURSOR_EXIT_POS             199
-#define DIST_BETWEEN_CHOICES        CURSOR_EXIT_POS-CURSOR_START_POS
+#define MAIN_MENU_SPRITE_PATH       (const char*)"res/graphic/main-menu.png"
+#define CURSOR_START_POS            226
+#define CURSOR_EXIT_POS             CURSOR_START_POS+20
+#define DIST_BETWEEN_CHOICES        20
 
 typedef struct mainmenu_s {
     Texture2D                       sprite;

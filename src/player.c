@@ -2,7 +2,7 @@
 
 void GeneratePlayerProjectiles(player_t *playermgr, projectilegroup_t *projectilemgr) {
     if (playermgr->in_cutscene.active) return;
-    if (IsKeyPressed(KEY_LEFT_CONTROL)) {
+    if (IsKeyPressed(GetControl(C_SHOOT))) {
         int new_proj_idx = ReturnEmptyProjectileIdx(projectilemgr);
 
         projectile_t new_projectile = { 0 };
@@ -63,13 +63,13 @@ void InitPlayer(player_t *playermgr) {
 
 void InitPlayerInCutscene(player_t *playermgr) {
     if (!playermgr->in_cutscene.active) return;
-    playermgr->in_cutscene.framedelta = GetFrameTime();
+    playermgr->in_cutscene.framedelta = FrameGetDelta();
 
     if (!playermgr->in_cutscene.done) {
-        if (playermgr->pos.y != GAME_HEIGHT-PLAYER_HEIGHT-3*16-1) {
+        if (playermgr->pos.y != GAME_HEIGHT-PLAYER_HEIGHT-60-1) {
             playermgr->pos.y -= 30*playermgr->in_cutscene.framedelta;
-            if (playermgr->pos.y <= GAME_HEIGHT-PLAYER_HEIGHT-3*16-1) {
-                playermgr->pos.y = GAME_HEIGHT-PLAYER_HEIGHT-3*16-1;
+            if (playermgr->pos.y <= GAME_HEIGHT-PLAYER_HEIGHT-60-1) {
+                playermgr->pos.y = GAME_HEIGHT-PLAYER_HEIGHT-60-1;
             }
         }
     }
@@ -85,13 +85,13 @@ void InitPlayerInCutscene(player_t *playermgr) {
 }
 
 void UpdatePosition(player_t *playermgr) {
-    if (IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT)) {
+    if (IsKeyDown(GetControl(C_MOVE_LEFT))) {
         playermgr->pos.x -= playermgr->speed*playermgr->deltaframe*60;
         if (playermgr->pos.x < 69) {
             playermgr->pos.x = 69;
         }
     }
-    if (IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT)) {
+    if (IsKeyDown(GetControl(C_MOVE_RIGHT))) {
         playermgr->pos.x += playermgr->speed*playermgr->deltaframe*60;
         if (playermgr->pos.x > GAME_WIDTH-69-PLAYER_WIDTH) {
             playermgr->pos.x = GAME_WIDTH-69-PLAYER_WIDTH;
@@ -100,7 +100,7 @@ void UpdatePosition(player_t *playermgr) {
 }
 
 void UpdatePlayerInput(player_t *playermgr, projectilegroup_t *projectilemgr) {
-    playermgr->deltaframe = GetFrameTime();
+    playermgr->deltaframe = FrameGetDelta();
     InitPlayerInCutscene(playermgr);
     UpdatePosition(playermgr);
     GeneratePlayerProjectiles(playermgr, projectilemgr);

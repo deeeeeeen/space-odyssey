@@ -6,7 +6,8 @@
 #define MAX_STARS                   50
 #define MAX_I8                      255
 #define MAX_STARTYPE                3
-#define SPACE_COLOR       (Color) { 5, 0, 19, 255 }
+#define SPACE_COLOR       (Color) { 38, 35, 47, 255 }
+#define NES_WHITE         (Color) { 252, 252, 252, 255 }
 
 enum startype_e {
     DOT,

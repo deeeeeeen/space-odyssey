@@ -7,27 +7,29 @@
     #include <unistd.h>
 #endif
 
-Font dfont;
-
 void GenerateRandomSeed();
+void LoadGameSave(game_t *gamemgr);
 
 void InitGameWindow(game_t *gamemgr) {
     memset(gamemgr, ZERO, sizeof(game_t));
     SetTraceLogCallback(ColorLog);
     GenerateRandomSeed();
-
+    
     SetConfigFlags(FLAG_VSYNC_HINT | FLAG_WINDOW_HIGHDPI);
     SetConfigFlags(FLAG_FULLSCREEN_MODE);
     InitWindow(ZERO, ZERO, GAME_TITLE);
-    SetTargetFPS(GAME_FPS);
     DisableCursor();
-
-    dfont = LoadFontEx("res/PIXEARG_.ttf", 11, ((void*)ZERO), ZERO);
-    SetTextureFilter(dfont.texture, TEXTURE_FILTER_POINT);
+    
+    InitSettings();
+    if (DoesSettingsFileExist()) {
+        LoadGameSave(gamemgr);
+    }
 }
 
 void InitGame(game_t *gamemgr) {
     InitGameWindow(gamemgr);
+    InitFont();
+    AudioInit();
     InitRender(&gamemgr->rendermgr);
     InitPlayer(&gamemgr->playermgr);
     InitEnemy(&gamemgr->enemymgr);
@@ -37,6 +39,7 @@ void InitGame(game_t *gamemgr) {
 void RunGame(game_t *gamemgr) {
     while (gamemgr->statemgr.state != EXIT)
     {
+        FrameUpdateDelta();
         switch (gamemgr->statemgr.state) {
             case TITLE_SCREEN:
                 UpdateMainMenuCursor(&gamemgr->statemgr, &gamemgr->rendermgr.main_menu);
@@ -57,17 +60,22 @@ void RunGame(game_t *gamemgr) {
                 break;
             case PAUSE:
                 UpdatePauseMenuCursor(&gamemgr->statemgr, &gamemgr->rendermgr.gui.pause_menu);
-                RenderPauseMenu(&gamemgr->rendermgr, &gamemgr->framemgr, &gamemgr->statemgr);
+                RenderPauseMenu(&gamemgr->rendermgr, &gamemgr->framemgr, &gamemgr->playermgr, &gamemgr->enemymgr, &gamemgr->projectilemgr);
                 break;
         }
     }
 }
 
 void ShutdownGame(game_t *gamemgr) {
+    AudioShutdown();
     CloseWindow();
 }
 
 void GenerateRandomSeed() {
     SetRandomSeed((unsigned int)time(NULL) ^ ((unsigned int)getpid() << 16));
     TraceLog(LOG_INFO, "RENDER: Random has been seeded!");
+}
+
+void LoadGameSave(game_t *gamemgr) {
+    
 }

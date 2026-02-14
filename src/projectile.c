@@ -11,11 +11,11 @@ int ReturnEmptyProjectileIdx(projectilegroup_t *projectilemgr) {
 }
 
 Color ProjColorType(projectile_t *projectile) {
-    return (projectile->friendly == true) ? GREEN : RED;
+    return (projectile->friendly == true) ? NES_GREEN : NES_RED;
 }
 
 void UpdateProjectiles(projectilegroup_t *projectilemgr) {
-    projectilemgr->framedelta = GetFrameTime();
+    projectilemgr->framedelta = FrameGetDelta();
 
     for (int proj_idx = 0; proj_idx < projectilemgr->projectile_count; proj_idx++) {
         if (projectilemgr->projectiles[proj_idx].alive) { // maybe not necessary to check, but just because :)

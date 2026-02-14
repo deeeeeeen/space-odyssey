@@ -1,11 +1,12 @@
 #ifndef GUI_H
 #define GUI_H
 #include "raylib.h"
+#include "frame.h"
 #include "globals.h"
 
-#define PM_CURSOR_RESUME_POS 137
+#define PM_CURSOR_RESUME_POS 137+36
 #define PM_CURSOR_EXIT_POS  PM_CURSOR_RESUME_POS+10
-#define PM_DIST_BETWEEN_CHOICES PM_CURSOR_EXIT_POS-PM_CURSOR_RESUME_POS
+#define PM_DIST_BETWEEN_CHOICES 10
 
 typedef struct sidebar_s {
     Rectangle               base;

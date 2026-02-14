@@ -16,12 +16,13 @@ void ProjectileCollMgr(projectilegroup_t *projectilemgr, enemygroup_t *enemymgr,
 
                 if (CheckCollisionPointCircle(proj_pos, enemy_coll_center, radius)) {
                     projectilemgr->projectiles[proj_idx].alive = false;
-                    projectilemgr->projectiles[proj_idx].pos = (Vector2) { 0.f, 0.f }; // i NEED to move the projectile otherwise the game will implode
+                    projectilemgr->projectiles[proj_idx].pos = (Vector2) { 2*GAME_WIDTH, 0.f }; // i NEED to move the projectile otherwise the game will implode
                     enemymgr->enemies[enemy_idx].health--;
                     if (enemymgr->enemies[enemy_idx].health <= 0) {
                         enemymgr->enemies[enemy_idx].alive = false;
                         enemymgr->alive_count--;
                         playermgr->score += 100;
+                        AudioPlay(ENEMY_KILL);
                     }
                 }
             }
@@ -32,7 +33,7 @@ void ProjectileCollMgr(projectilegroup_t *projectilemgr, enemygroup_t *enemymgr,
 
                 if (CheckCollisionPointCircle(proj_pos, player_coll_center, radius)) {
                     projectilemgr->projectiles[proj_idx].alive = false;
-                    projectilemgr->projectiles[proj_idx].pos = (Vector2) { 0.f, 0.f };
+                    projectilemgr->projectiles[proj_idx].pos = (Vector2) { 2*GAME_WIDTH, 0.f };
                     playermgr->health--;
                 }
             }

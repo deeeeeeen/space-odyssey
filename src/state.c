@@ -2,7 +2,8 @@
 
 void UpdateMainMenuCursor(state_t *statemgr, mainmenu_t *mainmenumgr) {
     
-    if (IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_S)) {
+    if (IsKeyPressed(GetControl(C_MOVE_DOWN))) {
+        AudioPlay(UI_MOVE);
         switch ((int)mainmenumgr->cursor_pos.y ) {
             case CURSOR_START_POS:
                 mainmenumgr->cursor_pos.y += DIST_BETWEEN_CHOICES;
@@ -12,7 +13,8 @@ void UpdateMainMenuCursor(state_t *statemgr, mainmenu_t *mainmenumgr) {
                 break;
         }
     }
-    else if (IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W)) {
+    else if (IsKeyPressed(GetControl(C_MOVE_UP))) {
+        AudioPlay(UI_MOVE);
         switch ((int)mainmenumgr->cursor_pos.y) {
             case CURSOR_START_POS:
                 mainmenumgr->cursor_pos.y += DIST_BETWEEN_CHOICES;
@@ -23,9 +25,10 @@ void UpdateMainMenuCursor(state_t *statemgr, mainmenu_t *mainmenumgr) {
         }
     }
 
-    if (IsKeyPressed(KEY_ENTER)) {
+    if (IsKeyPressed(GetControl(C_CONFIRM))) {
         switch ((int)mainmenumgr->cursor_pos.y) {
             case CURSOR_START_POS:
+                AudioPlay(UI_SELECT);
                 mainmenumgr->pressed_start = true;
                 break;
             case CURSOR_EXIT_POS:
@@ -37,7 +40,7 @@ void UpdateMainMenuCursor(state_t *statemgr, mainmenu_t *mainmenumgr) {
 
 void UpdatePauseMenuCursor(state_t *statemgr, pause_menu_t *pausemenumgr) {
     
-    if (IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_S)) {
+    if (IsKeyPressed(GetControl(C_MOVE_DOWN))) {
         switch ((int)pausemenumgr->cursor_pos.y ) {
             case PM_CURSOR_RESUME_POS:
                 pausemenumgr->cursor_pos.y += PM_DIST_BETWEEN_CHOICES;
@@ -47,7 +50,7 @@ void UpdatePauseMenuCursor(state_t *statemgr, pause_menu_t *pausemenumgr) {
                 break;
         }
     }
-    else if (IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W)) {
+    else if (IsKeyPressed(GetControl(C_MOVE_UP))) {
         switch ((int)pausemenumgr->cursor_pos.y) {
             case PM_CURSOR_RESUME_POS:
                 pausemenumgr->cursor_pos.y += PM_DIST_BETWEEN_CHOICES;
@@ -58,10 +61,9 @@ void UpdatePauseMenuCursor(state_t *statemgr, pause_menu_t *pausemenumgr) {
         }
     }
 
-    if (IsKeyPressed(KEY_ENTER)) {
+    if (IsKeyPressed(GetControl(C_CONFIRM))) {
         switch ((int)pausemenumgr->cursor_pos.y) {
             case PM_CURSOR_RESUME_POS:
-            //UnloadRenderTexture(statemgr->pause_tex);
                 statemgr->state = GAME;
                 break;
             case PM_CURSOR_EXIT_POS:
@@ -73,7 +75,7 @@ void UpdatePauseMenuCursor(state_t *statemgr, pause_menu_t *pausemenumgr) {
 
 void StartGame(state_t *statemgr, mainmenu_t *mainmenumgr, player_t *playermgr) {
     if (IsTitleGone(mainmenumgr)) {
-        playermgr->in_cutscene.framedelta = GetFrameTime();
+        playermgr->in_cutscene.framedelta = FrameGetDelta();
         if (playermgr->pos.y > GAME_HEIGHT-PLAYER_HEIGHT-1) {
             playermgr->pos.y -= 30*playermgr->in_cutscene.framedelta;
         }
@@ -89,8 +91,7 @@ void StartGame(state_t *statemgr, mainmenu_t *mainmenumgr, player_t *playermgr) 
 }
 
 void EndGame(state_t *statemgr, player_t *playermgr) {
-    if (IsKeyPressed(KEY_ESCAPE) && statemgr->state == GAME) {
-        statemgr->pause_tex = LoadRenderTexture(GAME_WIDTH, GAME_HEIGHT);
+    if (IsKeyPressed(GetControl(C_EXIT)) && statemgr->state == GAME) {
         statemgr->state = PAUSE;
     }
     if (playermgr->health <= 0) {

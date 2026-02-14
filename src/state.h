@@ -1,6 +1,9 @@
 #ifndef STATE_H
 #define STATE_H
 #include "raylib.h"
+#include "settings.h"
+#include "frame.h"
+#include "audio.h"
 #include "player.h"
 #include "gui.h"
 #include "main-menu.h"

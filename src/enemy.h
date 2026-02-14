@@ -2,13 +2,14 @@
 #define ENEMY_H
 
 #include "raylib.h"
+#include "frame.h"
 #include "projectile.h"
 
 #define MAX_ENEMIES         100
 #define ENEMY_WIDTH         17
 #define ENEMY_HEIGHT        16
-#define GAME_WIDTH          512
-#define GAME_HEIGHT         288
+#define GAME_WIDTH          640
+#define GAME_HEIGHT         360
 
 enum level1_e {
     LEFT,

@@ -2,9 +2,12 @@
 #define PORJECTILE_H
 
 #include "raylib.h"
+#include "frame.h"
 #include "globals.h"
 
 #define MAX_PROJECTILES     100
+#define NES_GREEN          (Color) { 62, 243, 63, 255 }
+#define NES_RED            (Color) { 232, 24, 19, 255 }
 
 enum projectile_type {
     SINGLE,

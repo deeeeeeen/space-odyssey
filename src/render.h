@@ -2,7 +2,9 @@
 #define RENDER_H
 
 #include "raylib.h"
+#include "settings.h"
 #include "raymath.h"
+#include "frame.h"
 #include "globals.h"
 #include "hud.h"
 #include "cutscene.h"
@@ -28,8 +30,15 @@ typedef struct player_s             player_t;
 typedef struct enemygroup_s         enemygroup_t;
 typedef struct projectilegroup_s    projectilegroup_t;
 
+typedef struct pause_s {
+    RenderTexture2D         frame;
+    bool                    drawn;
+} pause_t;
+
+
 typedef struct render_s {
     mainmenu_t              main_menu;
+    pause_t                 pause;
     hud_t                   hud;
     gui_t                   gui;
     stargroup_t             stars;
@@ -44,7 +53,7 @@ typedef struct render_s {
 
 void InitRender(render_t *rendermgr);
 void RenderTitle(render_t *rendermgr, frame_t *framemgr, player_t *playermgr);
-void RenderPauseMenu(render_t *rendermgr, frame_t *framemgr, state_t *statemgr);
+void RenderPauseMenu(render_t *rendermgr, frame_t *framemgr, player_t *playermgr, enemygroup_t *enemymgr, projectilegroup_t *projectilemgr);
 void RenderWindow(render_t *rendermgr, frame_t *framemgr, player_t *playermgr, enemygroup_t *enemymgr, projectilegroup_t *projectilemgr);
 
 #endif
